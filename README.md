@@ -29,7 +29,7 @@ MOA API ──fetch──▶ data/raw.json ──normalize──▶ data/product
 
 | 指令 | 說明 |
 |---|---|
-| `pnpm fetch` | 從 API 分頁抓取全部許可證資料，含重試與筆數檢查（對照 `data/baseline.json`） |
+| `pnpm run fetch` | 從 API 分頁抓取全部許可證資料，含重試與筆數檢查（對照 `data/baseline.json`） |
 | `pnpm normalize` | 標準化欄位、抽取成分與物種，產生搜尋索引與資料分片 |
 | `pnpm build` | 建置 Astro 靜態網站到 `dist/` |
 | `pnpm verify` | 檢查建置結果：分片數量、抽樣查找、頁面是否存在 |
@@ -42,7 +42,7 @@ MOA API ──fetch──▶ data/raw.json ──normalize──▶ data/product
 
 ```bash
 pnpm install
-pnpm fetch
+pnpm run fetch
 pnpm normalize
 pnpm dev
 ```

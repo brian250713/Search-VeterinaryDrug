@@ -39,7 +39,7 @@ jobs:
         run: pnpm install
 
       - name: 1. Fetch data from MOA API
-        run: pnpm fetch
+        run: pnpm run fetch
 
       - name: 2. Normalize and build search index
         run: pnpm normalize
@@ -95,7 +95,7 @@ jobs:
 
       - name: Fetch and update baseline
         run: |
-          pnpm fetch
+          pnpm run fetch
           pnpm tsx scripts/update-baseline.ts
 
       - name: Commit & push updated baseline
