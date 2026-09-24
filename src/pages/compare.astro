@@ -1,0 +1,422 @@
+---
+import Layout from '../layouts/Layout.astro';
+import metaData from '../../data/meta.json';
+import { withBase } from '../lib/url';
+
+const dataVersion = metaData.fetchedAt;
+---
+
+<Layout title="產品並排比較 - 動物用藥品資訊查詢" description="動物用藥品並排比較表，比對成分、劑型、適用物種與使用限制差異。">
+  <div id="compare-app" data-version={dataVersion} style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <div>
+      <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem; color: #111827;">動物用藥品並排比較</h1>
+      <p style="color: #6b7280; font-size: 0.95rem;">
+        並排比對最多 3 項藥品之成分規格、製造來源與適用物種適應症差異。
+      </p>
+    </div>
+
+    <!-- 頂端簡短免責提示 (Task 8.7) -->
+    <div style="background-color: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; padding: 0.75rem 1rem; border-radius: 6px; color: #92400e; font-size: 0.875rem;">
+      <strong>⚠️ 僅供參考，不構成用藥建議：</strong>
+      不同產品含量、劑型與賦形劑特性不同，不可擅自相互替代，處方使用請遵從執業獸醫師指示。
+    </div>
+
+    <!-- 載入中狀態 -->
+    <div id="compare-loading" class="card" style="text-align: center; padding: 2.5rem 1rem;">
+      <p style="color: #6b7280; font-size: 1rem;">正在載入比較資料...</p>
+    </div>
+
+    <!-- 無效 Slug 警告 -->
+    <div id="compare-warning" style="display: none; background-color: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 0.75rem 1rem; border-radius: 6px; font-size: 0.875rem;">
+    </div>
+
+    <!-- 空狀態引導 (Task 8.6) -->
+    <div id="compare-empty" class="card" style="display: none; text-align: center; padding: 3rem 1.5rem;">
+      <span style="font-size: 3rem;">⚖️</span>
+      <h2 style="font-size: 1.25rem; margin-top: 1rem; margin-bottom: 0.5rem; color: #374151;">目前比較清單為空</h2>
+      <p style="color: #6b7280; font-size: 0.95rem; max-width: 500px; margin: 0 auto 1.5rem auto;">
+        您可以從<strong>藥品搜尋列表</strong>、<strong>成分專頁</strong>或<strong>產品詳情頁</strong>點選「加入比較」勾選框，即可在此並排檢視最多 3 項產品的物種與成分差異。
+      </p>
+      <a href={withBase('/')} class="btn btn-primary">前往搜尋並加入產品 →</a>
+    </div>
+
+    <!-- 比較主畫面 -->
+    <div id="compare-container" style="display: none; flex-direction: column; gap: 2rem;">
+      <!-- 基本屬性比較表 -->
+      <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); background-color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+          <h2 style="font-size: 1.15rem; color: #047857; margin: 0;">產品基本規格與成分比較</h2>
+          <button id="clear-all-compare-btn" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">全部清空</button>
+        </div>
+        <div class="table-responsive">
+          <table id="spec-table" style="min-width: 600px;">
+            <thead id="spec-table-head"></thead>
+            <tbody id="spec-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 物種適應症支援矩陣 (Task 8.5) -->
+      <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); background-color: #ffffff;">
+          <h2 style="font-size: 1.15rem; color: #047857; margin: 0;">適用物種與使用限制矩陣</h2>
+          <p style="font-size: 0.85rem; color: #6b7280; margin-top: 0.25rem;">
+            比對各產品在不同物種上的適應症登錄狀態與蛋雞／蛋鴨限制。點選「展開」可檢視該物種的適應症原文。
+          </p>
+        </div>
+        <div class="table-responsive">
+          <table id="species-matrix-table" style="min-width: 600px;">
+            <thead id="matrix-table-head"></thead>
+            <tbody id="matrix-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .col-attr {
+      position: sticky;
+      left: 0;
+      background-color: #f9fafb;
+      z-index: 10;
+      width: 140px;
+      min-width: 140px;
+      max-width: 140px;
+      font-weight: 600;
+      border-right: 2px solid var(--border);
+    }
+    .col-prod {
+      min-width: 200px;
+      max-width: 320px;
+      vertical-align: top;
+      background-color: #ffffff;
+    }
+    .diff-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      margin-left: 0.4rem;
+    }
+    .diff-same {
+      background-color: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .diff-diff {
+      background-color: #fff7ed;
+      color: #9a3412;
+      border: 1px solid #fed7aa;
+    }
+  </style>
+
+  <script>
+    import { shardOf, shardPath, DRUG_SHARDS } from '../lib/shard';
+    import { dataUrl, drugUrl, ingredientUrl } from '../lib/url';
+    import { escapeHtml } from '../lib/escape-html';
+    import type { Product } from '../types/drug';
+
+    const SPECIES_NAMES_ZH: Record<string, string> = {
+      pig: '豬', chicken: '雞', duck: '鴨', goose: '鵝', turkey: '火雞',
+      cattle: '牛', sheep: '羊', horse: '馬', dog: '犬', cat: '貓',
+      rabbit: '兔', pigeon: '鴿', bee: '蜜蜂', 'eel-order': '鰻形目',
+      perciformes: '鱸形目', cypriniformes: '鯉形目', siluriformes: '鯰形目',
+      salmoniformes: '鮭形目', acipenseriformes: '鱘形目', gonorynchiformes: '鼠鱚目',
+      testudines: '龜鱉目', 'aquatic-general': '水產動物'
+    };
+
+    const appEl = document.getElementById('compare-app');
+    const dataVersion = appEl?.getAttribute('data-version') || undefined;
+
+    async function loadProductsBySlugs(targetSlugs: string[]): Promise<Record<string, Product>> {
+      if (targetSlugs.length === 0) return {};
+
+      const uniqueShards = new Set<number>();
+      for (const slug of targetSlugs) {
+        uniqueShards.add(shardOf(slug, DRUG_SHARDS));
+      }
+
+      const results = await Promise.all(
+        Array.from(uniqueShards).map(async (n) => {
+          try {
+            const url = dataUrl(shardPath('drug', n), dataVersion);
+            const res = await fetch(url);
+            if (!res.ok) return {};
+            return (await res.json()) as Record<string, Product>;
+          } catch (err) {
+            console.error('[compare] 分片載入失敗:', n, err);
+            return {};
+          }
+        })
+      );
+
+      return Object.assign({}, ...results);
+    }
+
+    function getSelectedSlugs(): string[] {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlIds = urlParams.get('ids');
+      if (urlIds) {
+        return urlIds.split(',').map((s) => s.trim()).filter(Boolean).slice(0, 3);
+      }
+      try {
+        const raw = localStorage.getItem('vet_drug_compare_list');
+        const list = raw ? JSON.parse(raw) : [];
+        return Array.isArray(list) ? list.slice(0, 3) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function syncUrl(slugs: string[]) {
+      const url = new URL(window.location.href);
+      if (slugs.length > 0) {
+        url.searchParams.set('ids', slugs.join(','));
+      } else {
+        url.searchParams.delete('ids');
+      }
+      window.history.replaceState({}, '', url.toString());
+    }
+
+    function removeProduct(slug: string) {
+      const slugs = getSelectedSlugs().filter((s) => s !== slug);
+      try {
+        localStorage.setItem('vet_drug_compare_list', JSON.stringify(slugs));
+        window.dispatchEvent(new Event('compare-updated'));
+      } catch {}
+      syncUrl(slugs);
+      renderCompare();
+    }
+    (window as any).removeProduct = removeProduct;
+
+    async function renderCompare() {
+      const loadingEl = document.getElementById('compare-loading');
+      const emptyEl = document.getElementById('compare-empty');
+      const containerEl = document.getElementById('compare-container');
+      const warnEl = document.getElementById('compare-warning');
+
+      if (loadingEl) loadingEl.style.display = 'block';
+      if (emptyEl) emptyEl.style.display = 'none';
+      if (containerEl) containerEl.style.display = 'none';
+      if (warnEl) warnEl.style.display = 'none';
+
+      const targetSlugs = getSelectedSlugs();
+      syncUrl(targetSlugs);
+
+      if (targetSlugs.length === 0) {
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (emptyEl) emptyEl.style.display = 'block';
+        return;
+      }
+
+      const productsMap = await loadProductsBySlugs(targetSlugs);
+
+      const validProducts: Product[] = [];
+      const invalidSlugs: string[] = [];
+
+      for (const s of targetSlugs) {
+        if (productsMap[s]) {
+          validProducts.push(productsMap[s]);
+        } else {
+          invalidSlugs.push(s);
+        }
+      }
+
+      if (loadingEl) loadingEl.style.display = 'none';
+
+      if (invalidSlugs.length > 0 && warnEl) {
+        warnEl.style.display = 'block';
+        warnEl.textContent = `提示：網址中有 ${invalidSlugs.length} 項產品代碼找不到或已無效（${invalidSlugs.join(', ')}），已自動略過。`;
+      }
+
+      if (validProducts.length === 0) {
+        if (emptyEl) emptyEl.style.display = 'block';
+        return;
+      }
+
+      if (containerEl) containerEl.style.display = 'flex';
+      buildSpecTable(validProducts);
+      buildSpeciesMatrix(validProducts);
+    }
+
+    function buildSpecTable(products: Product[]) {
+      const thead = document.getElementById('spec-table-head');
+      const tbody = document.getElementById('spec-table-body');
+      if (!thead || !tbody) return;
+      thead.innerHTML = '';
+      tbody.innerHTML = '';
+
+      // Header row
+      const headRow = document.createElement('tr');
+      headRow.innerHTML = `<th class="col-attr">比較屬性</th>` + products.map((p) => `
+        <th class="col-prod">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem;">
+            <a href="${drugUrl(p.slug)}" style="font-size: 1rem; font-weight: 700;">${escapeHtml(p.nameZh)}</a>
+            <button onclick="removeProduct('${escapeHtml(p.slug)}')" title="從比較中移除" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.85rem;">✕</button>
+          </div>
+          <div style="font-size: 0.8rem; color: #6b7280; margin-top: 0.25rem;">${escapeHtml(p.licenseNo)}</div>
+        </th>
+      `).join('');
+      thead.appendChild(headRow);
+
+      const rows = [
+        {
+          label: '劑型大類',
+          getter: (p: Product) => p.dosageForm?.category || '未載明',
+          render: (p: Product) => `<strong>${escapeHtml(p.dosageForm?.category || '未載明')}</strong> <span style="color:#6b7280; font-size:0.8rem;">[${escapeHtml(p.dosageForm?.raw || '未載明')}]</span>`
+        },
+        {
+          label: '標準成分',
+          getter: (p: Product) => (p.ingredients || []).map((i) => i.name).sort().join(', '),
+          render: (p: Product) => {
+            const singleTag = p.isSingleIngredient 
+              ? '<span class="badge" style="background-color:#dcfce7; color:#15803d; margin-bottom:0.4rem;">單方</span>'
+              : '<span class="badge" style="background-color:#fef9c3; color:#a16207; margin-bottom:0.4rem;">複方</span>';
+            const ingLinks = (p.ingredients || []).map((i) => {
+              const ingSlug = i.slug || i.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+              const cn = i.chineseName ? ` (${escapeHtml(i.chineseName)})` : '';
+              return `<a href="${ingredientUrl(ingSlug)}" style="display:inline-block; margin-right:0.3rem;">${escapeHtml(i.name)}${cn}</a>`;
+            }).join('');
+            return `<div>${singleTag}</div><div>${ingLinks || '無標準成分'}</div>`;
+          }
+        },
+        {
+          label: '成分原文',
+          getter: (p: Product) => p.ingredientsText || '',
+          render: (p: Product) => `<div style="font-size:0.85rem; max-height:120px; overflow-y:auto; white-space:pre-wrap; background:#f9fafb; padding:0.4rem; border-radius:4px;">${escapeHtml(p.ingredientsText || '未載明')}</div>`
+        },
+        {
+          label: '產地來源',
+          getter: (p: Product) => p.origin,
+          render: (p: Product) => `<span class="badge" style="background:#f3f4f6; color:#374151;">${escapeHtml(p.origin)}</span>`
+        },
+        {
+          label: '申請業者',
+          getter: (p: Product) => p.vendorName || '',
+          render: (p: Product) => escapeHtml(p.vendorName || '未載明')
+        },
+        {
+          label: '製造廠',
+          getter: (p: Product) => p.factoryName || '',
+          render: (p: Product) => escapeHtml(p.factoryName || '未載明')
+        },
+        {
+          label: '有效狀態',
+          getter: (p: Product) => p.status,
+          render: (p: Product) => {
+            if (p.status === 'active') return '<span class="badge badge-active">有效</span>';
+            if (p.status === 'expired') return '<span class="badge badge-expired">已失效</span>';
+            return '<span class="badge badge-unknown">效期未載明</span>';
+          }
+        }
+      ];
+
+      for (const r of rows) {
+        const tr = document.createElement('tr');
+        const vals = products.map((p) => r.getter(p));
+        const allSame = vals.length > 1 && vals.every((v) => v === vals[0]);
+        const badge = products.length > 1
+          ? (allSame ? '<span class="diff-badge diff-same">相同</span>' : '<span class="diff-badge diff-diff">有差異</span>')
+          : '';
+
+        let html = `<th class="col-attr">${r.label}${badge}</th>`;
+        for (const p of products) {
+          html += `<td class="col-prod">${r.render(p)}</td>`;
+        }
+        tr.innerHTML = html;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function buildSpeciesMatrix(products: Product[]) {
+      const thead = document.getElementById('matrix-table-head');
+      const tbody = document.getElementById('matrix-table-body');
+      if (!thead || !tbody) return;
+      thead.innerHTML = '';
+      tbody.innerHTML = '';
+
+      // Header row
+      const headRow = document.createElement('tr');
+      headRow.innerHTML = `<th class="col-attr">涉及物種</th>` + products.map((p) => `
+        <th class="col-prod">
+          <strong>${escapeHtml(p.nameZh)}</strong>
+        </th>
+      `).join('');
+      thead.appendChild(headRow);
+
+      const allSpeciesSet = new Set<string>();
+      for (const p of products) {
+        for (const sp of (p.speciesIndications || [])) {
+          allSpeciesSet.add(sp.species);
+        }
+      }
+
+      if (allSpeciesSet.size === 0) {
+        tbody.innerHTML = `<tr><td colspan="${products.length + 1}" style="text-align:center; padding:1.5rem; color:#6b7280;">比較的產品均無結構化適用物種資訊</td></tr>`;
+        return;
+      }
+
+      const speciesList = Array.from(allSpeciesSet).sort();
+
+      for (const spId of speciesList) {
+        const spName = SPECIES_NAMES_ZH[spId] || spId;
+        const tr = document.createElement('tr');
+        let html = `<th class="col-attr">${escapeHtml(spName)}</th>`;
+
+        for (const p of products) {
+          const match = (p.speciesIndications || []).find((i) => i.species === spId);
+          if (!match) {
+            html += `<td class="col-prod" style="color: #9ca3af;">— 不適用</td>`;
+          } else {
+            const hasRestr = match.restrictions && match.restrictions.length > 0;
+            const restrText = hasRestr 
+              ? match.restrictions.map((r) => r === 'not-laying-hens' ? '不含產蛋中之蛋雞' : (r === 'not-laying-ducks' ? '不含產蛋中之蛋鴨' : r)).join('、')
+              : '';
+            const statusTag = hasRestr
+              ? `<div class="badge badge-warn" style="margin-bottom:0.25rem;">⚠️ 有限制：${escapeHtml(restrText)}</div>`
+              : `<div class="badge badge-active" style="margin-bottom:0.25rem;">✅ 適用</div>`;
+            const genericTag = match.generic ? `<span class="badge badge-generic" style="margin-left:0.25rem;">泛稱</span>` : '';
+
+            const uniqueId = `ind_${p.slug}_${spId}`.replace(/[^a-zA-Z0-9_]/g, '_');
+            const toggleBtn = match.indication
+              ? `<button onclick="toggleIndication('${uniqueId}')" style="background:none; border:none; color:#047857; cursor:pointer; font-size:0.75rem; text-decoration:underline; display:block; margin-top:0.25rem;">展開適應症 ▾</button>
+                 <div id="${uniqueId}" style="display:none; font-size:0.8rem; background:#f9fafb; padding:0.4rem; border-radius:4px; margin-top:0.3rem; border:1px solid #e5e7eb; white-space:pre-wrap;">${escapeHtml(match.indication)}</div>`
+              : '';
+
+            html += `<td class="col-prod">
+              <div style="display:flex; align-items:center; flex-wrap:wrap;">${statusTag}${genericTag}</div>
+              ${toggleBtn}
+            </td>`;
+          }
+        }
+        tr.innerHTML = html;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function toggleIndication(id: string) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.display = el.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+    (window as any).toggleIndication = toggleIndication;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCompare();
+
+      const clearAllBtn = document.getElementById('clear-all-compare-btn');
+      if (clearAllBtn) {
+        clearAllBtn.addEventListener('click', () => {
+          try {
+            localStorage.setItem('vet_drug_compare_list', JSON.stringify([]));
+            window.dispatchEvent(new Event('compare-updated'));
+          } catch {}
+          syncUrl([]);
+          renderCompare();
+        });
+      }
+    });
+  </script>
+</Layout>

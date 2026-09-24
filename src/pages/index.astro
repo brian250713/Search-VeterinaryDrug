@@ -1,0 +1,686 @@
+---
+import Layout from '../layouts/Layout.astro';
+import metaData from '../../data/meta.json';
+---
+
+<Layout title="動物用藥品資訊查詢 - 獸醫與養殖戶開放資料工具">
+  <div id="search-app" data-version={metaData.fetchedAt} style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <!-- 搜尋列卡片 -->
+    <div class="card" style="background: linear-gradient(to bottom, #ffffff, #f0fdf4); border: 1px solid #bbf7d0; padding: 1.5rem;">
+      <h1 style="font-size: 1.5rem; color: #065f46; margin-bottom: 0.5rem;">動物用藥品檢索</h1>
+      <p style="font-size: 0.9rem; color: #4b5563; margin-bottom: 1rem;">
+        支援中文品名、英文品名、標準成分（中英文）、業者名稱、許可證字號與適應症模糊搜尋。
+      </p>
+
+      <div style="position: relative;">
+        <input
+          type="text"
+          id="search-input"
+          class="input-text"
+          placeholder="輸入藥品名稱、成分（如阿莫西林、Tylosin）、字號（如 09469）或疾病..."
+          style="font-size: 1.05rem; padding: 0.75rem 1rem; border-radius: 8px; border: 2px solid #059669;"
+          autocomplete="off"
+        />
+        <div id="index-loading-badge" style="display: none; position: absolute; right: 12px; top: 12px; font-size: 0.85rem; color: #047857; background: #ecfdf5; padding: 0.1rem 0.5rem; border-radius: 4px;">
+          載入索引中...
+        </div>
+      </div>
+    </div>
+
+    <!-- 篩選與結果區塊 (雙欄 / 行動端單欄) -->
+    <div style="display: grid; grid-template-columns: 260px 1fr; gap: 1.5rem; align-items: start;" id="main-content-layout">
+      <!-- 手機版展開按鈕 (<= 768px 顯示) -->
+      <button id="toggle-filter-btn" class="btn btn-secondary" style="display: none; width: 100%; margin-bottom: 0.5rem;">
+        🔍 展開篩選條件 ▾
+      </button>
+
+      <!-- 側邊篩選面板 -->
+      <aside class="card" id="filter-panel" style="display: flex; flex-direction: column; gap: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h2 style="font-size: 1.05rem; color: #111827; margin: 0;">篩選條件</h2>
+          <button id="reset-filter-btn" style="background: none; border: none; color: #047857; cursor: pointer; font-size: 0.8rem; text-decoration: underline;">重設</button>
+        </div>
+
+        <!-- 適用物種 -->
+        <div>
+          <label style="font-size: 0.85rem; font-weight: 600; color: #374151; display: block; margin-bottom: 0.35rem;">適用物種</label>
+          <select id="filter-species" class="input-text" style="font-size: 0.9rem; padding: 0.4rem;">
+            <option value="">全部物種</option>
+            <option value="pig">豬</option>
+            <option value="chicken">雞（含肉雞／種雞）</option>
+            <option value="laying-hen">🥚 蛋雞（自動排他限制）</option>
+            <option value="duck">鴨（含肉鴨）</option>
+            <option value="laying-duck">🥚 蛋鴨（自動排他限制）</option>
+            <option value="goose">鵝</option>
+            <option value="turkey">火雞</option>
+            <option value="cattle">牛</option>
+            <option value="sheep">羊</option>
+            <option value="horse">馬</option>
+            <option value="dog">犬</option>
+            <option value="cat">貓</option>
+            <option value="aquatic">🐟 水產（各目與魚蝦貝）</option>
+          </select>
+        </div>
+
+        <!-- 劑型大類 -->
+        <div>
+          <label style="font-size: 0.85rem; font-weight: 600; color: #374151; display: block; margin-bottom: 0.35rem;">劑型大類</label>
+          <select id="filter-dosage" class="input-text" style="font-size: 0.9rem; padding: 0.4rem;">
+            <option value="">全部劑型</option>
+            <option value="注射劑">注射劑</option>
+            <option value="散劑">散劑</option>
+            <option value="口服液劑">口服液劑</option>
+            <option value="外用液劑">外用液劑</option>
+            <option value="錠劑">錠劑</option>
+            <option value="膠囊劑">膠囊劑</option>
+            <option value="顆粒劑">顆粒劑</option>
+            <option value="軟膏劑">軟膏劑</option>
+            <option value="消毒劑">消毒劑</option>
+          </select>
+        </div>
+
+        <!-- 單複方 -->
+        <div>
+          <label style="font-size: 0.85rem; font-weight: 600; color: #374151; display: block; margin-bottom: 0.35rem;">單方／複方</label>
+          <select id="filter-ingredient-type" class="input-text" style="font-size: 0.9rem; padding: 0.4rem;">
+            <option value="all">全部</option>
+            <option value="single">單方藥品</option>
+            <option value="compound">複方藥品</option>
+          </select>
+        </div>
+
+        <!-- 國產／輸入 -->
+        <div>
+          <label style="font-size: 0.85rem; font-weight: 600; color: #374151; display: block; margin-bottom: 0.35rem;">產地來源</label>
+          <select id="filter-origin" class="input-text" style="font-size: 0.9rem; padding: 0.4rem;">
+            <option value="all">全部</option>
+            <option value="國產">國產藥品</option>
+            <option value="輸入">輸入藥品</option>
+          </select>
+        </div>
+
+        <!-- 進階與排除規則 -->
+        <div style="border-top: 1px solid var(--border); padding-top: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem;">
+          <label style="font-size: 0.85rem; font-weight: 600; color: #374151;">預設排除與進階選項</label>
+          <label style="font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+            <input type="checkbox" id="filter-include-expired" />
+            <span>包含已失效藥品</span>
+          </label>
+          <label style="font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+            <input type="checkbox" id="filter-include-biologic" />
+            <span>包含生物製劑（疫苗）</span>
+          </label>
+          <label style="font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+            <input type="checkbox" id="filter-include-raw" />
+            <span>包含原料藥</span>
+          </label>
+          <label style="font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+            <input type="checkbox" id="filter-include-export" />
+            <span>包含外銷專用</span>
+          </label>
+        </div>
+      </aside>
+
+      <!-- 結果清單主體 -->
+      <section style="display: flex; flex-direction: column; gap: 1rem;">
+        <!-- 狀態摘要條 -->
+        <div id="results-meta-bar" style="font-size: 0.9rem; color: #4b5563; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.5rem;">
+          <span>查詢結果：共 <strong id="result-count" style="color: #047857;">0</strong> 筆產品</span>
+          <span id="initial-hint" style="color: #6b7280; font-size: 0.85rem;">點選搜尋框即可啟用完整檢索</span>
+        </div>
+
+        <!-- 蛋雞／蛋鴨排除提醒與展開開關 -->
+        <div id="laying-alert" style="display: none; background-color: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; padding: 0.75rem 1rem; border-radius: 6px; font-size: 0.85rem; color: #92400e;">
+          <span>⚠️ 另有 <strong id="laying-excluded-count">0</strong> 項產品因標記「不含產蛋中之蛋雞／蛋鴨」而被預設排除。</span>
+          <button id="toggle-laying-btn" style="background: none; border: none; color: #b45309; text-decoration: underline; cursor: pointer; font-weight: 600; margin-left: 0.5rem;">
+            展開這些產品檢視
+          </button>
+        </div>
+
+        <!-- 已失效隱藏提醒 -->
+        <div id="expired-alert" style="display: none; background-color: #f3f4f6; padding: 0.6rem 1rem; border-radius: 6px; font-size: 0.85rem; color: #4b5563;">
+          <span>另有 <strong id="expired-hidden-count">0</strong> 項已失效許可證被隱藏。</span>
+          <button id="quick-show-expired-btn" style="background: none; border: none; color: #047857; text-decoration: underline; cursor: pointer; margin-left: 0.4rem;">
+            納入已失效產品
+          </button>
+        </div>
+
+        <!-- 結果清單容器 -->
+        <div id="results-list" style="display: flex; flex-direction: column; gap: 0.85rem;">
+          <!-- 初始骨架卡片 -->
+          <div class="card" style="padding: 2.5rem 1rem; text-align: center; color: #6b7280;">
+            <p style="font-size: 1.1rem; margin-bottom: 0.5rem; color: #374151;">請輸入關鍵字或選擇左側分類篩選</p>
+            <p style="font-size: 0.85rem;">目前收錄有效藥品約 3,680+ 筆，點擊搜尋框立即載入離線搜尋引擎</p>
+          </div>
+        </div>
+
+        <!-- 分頁控制 -->
+        <div id="pagination-bar" style="display: none; justify-content: center; gap: 0.5rem; margin-top: 1rem;">
+          <button id="prev-page-btn" class="btn btn-secondary" style="padding: 0.4rem 0.8rem;">上一頁</button>
+          <span id="page-indicator" style="display: flex; align-items: center; font-size: 0.9rem; color: #374151;"></span>
+          <button id="next-page-btn" class="btn btn-secondary" style="padding: 0.4rem 0.8rem;">下一頁</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <style>
+    @media (max-width: 768px) {
+      #main-content-layout {
+        grid-template-columns: 1fr !important;
+      }
+      #toggle-filter-btn {
+        display: block !important;
+      }
+      #filter-panel {
+        display: none;
+      }
+      #filter-panel.show-mobile {
+        display: flex !important;
+      }
+    }
+  </style>
+
+  <script>
+    import { escapeHtml } from '../lib/escape-html';
+    import { drugUrl, ingredientUrl, dataUrl } from '../lib/url';
+
+    const appEl = document.getElementById('search-app');
+    const dataVersion = appEl?.getAttribute('data-version') || undefined;
+
+    // CJK Bigram Tokenizer in Browser
+    function cjkTokenizer(text) {
+      if (!text) return [];
+      const norm = text.toLowerCase();
+      const tokens = [];
+      const nonCjk = norm.split(/[^a-z0-9]+/i).filter(Boolean);
+      tokens.push(...nonCjk);
+      const cjkSegs = norm.match(/[\u4e00-\u9fa5]+/g) || [];
+      for (const seg of cjkSegs) {
+        for (let i = 0; i < seg.length; i++) tokens.push(seg[i]);
+        for (let i = 0; i < seg.length - 1; i++) tokens.push(seg.slice(i, i + 2));
+      }
+      return tokens;
+    }
+
+    const AQUATIC_SPECIES = new Set([
+      'eel-order', 'perciformes', 'cypriniformes', 'siluriformes',
+      'salmoniformes', 'acipenseriformes', 'gonorynchiformes', 'testudines', 'aquatic-general'
+    ]);
+
+    const SPECIES_NAMES_ZH = {
+      pig: '豬', chicken: '雞', duck: '鴨', goose: '鵝', turkey: '火雞',
+      cattle: '牛', sheep: '羊', horse: '馬', dog: '犬', cat: '貓',
+      rabbit: '兔', pigeon: '鴿', bee: '蜜蜂', 'eel-order': '鰻形目',
+      perciformes: '鱸形目', cypriniformes: '鯉形目', siluriformes: '鯰形目',
+      salmoniformes: '鮭形目', acipenseriformes: '鱘形目', gonorynchiformes: '鼠鱚目',
+      testudines: '龜鱉目', 'aquatic-general': '水產動物'
+    };
+
+    let mainIndex = null;
+    let expiredIndex = null;
+    let allLoadedDocs = [];
+    let isIndexLoaded = false;
+    let isIndexLoading = false;
+
+    let currentPage = 1;
+    const PAGE_SIZE = 20;
+    let currentFilteredList = [];
+    let expandRestrictedLaying = false;
+
+    async function loadSearchIndex() {
+      if (isIndexLoaded || isIndexLoading) return;
+      isIndexLoading = true;
+      const loadingBadge = document.getElementById('index-loading-badge');
+      if (loadingBadge) loadingBadge.style.display = 'block';
+
+      try {
+        const res = await fetch(dataUrl('data/search-index.json', dataVersion));
+        const json = await res.json();
+        mainIndex = json;
+        allLoadedDocs = Object.values(json.storedFields || {});
+        isIndexLoaded = true;
+      } catch (e) {
+        console.error('Failed to load search index:', e);
+      } finally {
+        isIndexLoading = false;
+        if (loadingBadge) loadingBadge.style.display = 'none';
+        const hint = document.getElementById('initial-hint');
+        if (hint) hint.textContent = '搜尋索引已就緒';
+      }
+    }
+
+    async function loadExpiredIndexIfNeeded() {
+      const incExpired = document.getElementById('filter-include-expired')?.checked;
+      if (incExpired && !expiredIndex) {
+        const loadingBadge = document.getElementById('index-loading-badge');
+        if (loadingBadge) {
+          loadingBadge.textContent = '載入已失效索引...';
+          loadingBadge.style.display = 'block';
+        }
+        try {
+          const res = await fetch(dataUrl('data/expired-search-index.json', dataVersion));
+          const json = await res.json();
+          expiredIndex = json;
+          const expiredDocs = Object.values(json.storedFields || {});
+          allLoadedDocs.push(...expiredDocs);
+        } catch (e) {
+          console.error('Failed to load expired index:', e);
+        } finally {
+          if (loadingBadge) loadingBadge.style.display = 'none';
+        }
+      }
+    }
+
+    function getFilterState() {
+      return {
+        query: document.getElementById('search-input')?.value.trim() || '',
+        species: document.getElementById('filter-species')?.value || '',
+        dosage: document.getElementById('filter-dosage')?.value || '',
+        ingredientType: document.getElementById('filter-ingredient-type')?.value || 'all',
+        origin: document.getElementById('filter-origin')?.value || 'all',
+        includeExpired: document.getElementById('filter-include-expired')?.checked || false,
+        includeBiologic: document.getElementById('filter-include-biologic')?.checked || false,
+        includeRaw: document.getElementById('filter-include-raw')?.checked || false,
+        includeExport: document.getElementById('filter-include-export')?.checked || false,
+      };
+    }
+
+    function syncStateToUrl(state) {
+      const url = new URL(window.location.href);
+      if (state.query) url.searchParams.set('q', state.query); else url.searchParams.delete('q');
+      if (state.species) url.searchParams.set('species', state.species); else url.searchParams.delete('species');
+      if (state.dosage) url.searchParams.set('dosage', state.dosage); else url.searchParams.delete('dosage');
+      if (state.ingredientType !== 'all') url.searchParams.set('ingType', state.ingredientType); else url.searchParams.delete('ingType');
+      if (state.origin !== 'all') url.searchParams.set('origin', state.origin); else url.searchParams.delete('origin');
+      if (state.includeExpired) url.searchParams.set('expired', '1'); else url.searchParams.delete('expired');
+      if (state.includeBiologic) url.searchParams.set('biologic', '1'); else url.searchParams.delete('biologic');
+      if (state.includeRaw) url.searchParams.set('raw', '1'); else url.searchParams.delete('raw');
+      if (state.includeExport) url.searchParams.set('export', '1'); else url.searchParams.delete('export');
+
+      window.history.replaceState({}, '', url.toString());
+    }
+
+    function restoreStateFromUrl() {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get('q')) document.getElementById('search-input').value = p.get('q');
+      if (p.get('species')) document.getElementById('filter-species').value = p.get('species');
+      if (p.get('dosage')) document.getElementById('filter-dosage').value = p.get('dosage');
+      if (p.get('ingType')) document.getElementById('filter-ingredient-type').value = p.get('ingType');
+      if (p.get('origin')) document.getElementById('filter-origin').value = p.get('origin');
+      if (p.get('expired') === '1') document.getElementById('filter-include-expired').checked = true;
+      if (p.get('biologic') === '1') document.getElementById('filter-include-biologic').checked = true;
+      if (p.get('raw') === '1') document.getElementById('filter-include-raw').checked = true;
+      if (p.get('export') === '1') document.getElementById('filter-include-export').checked = true;
+    }
+
+    // Execute Search and Filter
+    async function runSearchAndFilter() {
+      if (!isIndexLoaded) {
+        await loadSearchIndex();
+      }
+      await loadExpiredIndexIfNeeded();
+
+      const state = getFilterState();
+      syncStateToUrl(state);
+
+      let candidates = allLoadedDocs;
+
+      // 1. Text Search if query exists
+      if (state.query) {
+        const queryTokens = cjkTokenizer(state.query);
+        if (queryTokens.length > 0) {
+          const q = state.query.toLowerCase();
+          // Filter candidate matches in memory
+          candidates = candidates.filter(doc => {
+            const nameZh = (doc.nameZh || '').toLowerCase();
+            const nameEn = (doc.nameEn || '').toLowerCase();
+            const lic = (doc.licenseNo || '').toLowerCase();
+            const vendor = (doc.vendorName || '').toLowerCase();
+            const ingText = (doc.ingredientsText || '').toLowerCase();
+            const allText = `${nameZh} ${nameEn} ${lic} ${vendor} ${ingText}`;
+
+            return queryTokens.every(tok => allText.includes(tok));
+          });
+        }
+      }
+
+      // 2. Filter rules
+      let hiddenExpired = 0;
+      let excludedLaying = 0;
+
+      const filtered = candidates.filter(doc => {
+        // Classification filters
+        if (!state.includeBiologic && doc.category === 'biologic') return false;
+        if (!state.includeRaw && doc.category === 'raw-material') return false;
+        if (!state.includeExport && doc.exportOnly) return false;
+
+        // Status filter
+        if (doc.status === 'expired') {
+          if (!state.includeExpired) {
+            hiddenExpired++;
+            return false;
+          }
+        }
+
+        // Origin filter
+        if (state.origin !== 'all' && doc.origin !== state.origin) return false;
+
+        // Dosage filter
+        if (state.dosage && doc.dosageFormCategory !== state.dosage) return false;
+
+        // Single / Compound filter
+        if (state.ingredientType === 'single' && !doc.isSingleIngredient) return false;
+        if (state.ingredientType === 'compound' && doc.isSingleIngredient) return false;
+
+        // Species & restriction filter
+        if (state.species) {
+          const spList = doc.speciesIndications || [];
+          if (state.species === 'aquatic') {
+            if (!spList.some(s => AQUATIC_SPECIES.has(s.species))) return false;
+          } else if (state.species === 'laying-hen') {
+            const chicken = spList.find(s => s.species === 'chicken');
+            if (!chicken) return false;
+            if (chicken.restrictions && chicken.restrictions.includes('not-laying-hens')) {
+              if (!expandRestrictedLaying) {
+                excludedLaying++;
+                return false;
+              }
+            }
+          } else if (state.species === 'laying-duck') {
+            const duck = spList.find(s => s.species === 'duck');
+            if (!duck) return false;
+            if (duck.restrictions && duck.restrictions.includes('not-laying-ducks')) {
+              if (!expandRestrictedLaying) {
+                excludedLaying++;
+                return false;
+              }
+            }
+          } else {
+            if (!spList.some(s => s.species === state.species)) return false;
+          }
+        }
+
+        return true;
+      });
+
+      currentFilteredList = filtered;
+      currentPage = 1;
+
+      // Update alert badges
+      const layingAlert = document.getElementById('laying-alert');
+      const layingCount = document.getElementById('laying-excluded-count');
+      if (layingAlert && layingCount) {
+        if (excludedLaying > 0 && !expandRestrictedLaying) {
+          layingAlert.style.display = 'block';
+          layingCount.textContent = excludedLaying;
+        } else {
+          layingAlert.style.display = 'none';
+        }
+      }
+
+      const expiredAlert = document.getElementById('expired-alert');
+      const expiredCount = document.getElementById('expired-hidden-count');
+      if (expiredAlert && expiredCount) {
+        if (hiddenExpired > 0) {
+          expiredAlert.style.display = 'block';
+          expiredCount.textContent = hiddenExpired;
+        } else {
+          expiredAlert.style.display = 'none';
+        }
+      }
+
+      document.getElementById('result-count').textContent = filtered.length.toLocaleString();
+      renderPage();
+    }
+
+    function getCompareList() {
+      try {
+        const raw = localStorage.getItem('vet_drug_compare_list');
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function toggleCompare(slug, isChecked) {
+      try {
+        let list = getCompareList();
+        if (!Array.isArray(list)) list = [];
+        if (isChecked) {
+          if (list.length >= 3) {
+            alert('比較清單上限為 3 項產品');
+            const cb = document.querySelector(`.compare-chk[data-slug="${slug}"]`);
+            if (cb) cb.checked = false;
+            return;
+          }
+          if (!list.includes(slug)) list.push(slug);
+        } else {
+          list = list.filter(s => s !== slug);
+        }
+        localStorage.setItem('vet_drug_compare_list', JSON.stringify(list));
+        window.dispatchEvent(new Event('compare-updated'));
+      } catch (e) {}
+    }
+
+    function renderPage() {
+      const container = document.getElementById('results-list');
+      container.innerHTML = '';
+
+      if (currentFilteredList.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="padding: 2rem; text-align: center; color: #6b7280;">
+            <p style="font-size: 1.1rem; color: #374151; margin-bottom: 0.5rem;">查無符合條件的藥品</p>
+            <p style="font-size: 0.85rem;">請嘗試減少篩選條件，或在左側勾選「包含已失效藥品」或「生物製劑」。</p>
+          </div>
+        `;
+        document.getElementById('pagination-bar').style.display = 'none';
+        return;
+      }
+
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const end = start + PAGE_SIZE;
+      const pageItems = currentFilteredList.slice(start, end);
+      const compareList = getCompareList();
+
+      for (const p of pageItems) {
+        const isCompared = compareList.includes(p.slug);
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.gap = '0.6rem';
+
+        let statusTag = '';
+        if (p.status === 'active') statusTag = '<span class="badge badge-active">有效</span>';
+        else if (p.status === 'expired') statusTag = '<span class="badge badge-expired">已失效</span>';
+        else statusTag = '<span class="badge badge-unknown">效期未載明</span>';
+
+        const originTag = `<span class="badge" style="background:#f3f4f6; color:#374151;">${escapeHtml(p.origin)}</span>`;
+        const singleTag = p.isSingleIngredient
+          ? '<span class="badge" style="background:#f0fdf4; color:#166534; border:1px solid #bbf7d0;">單方</span>'
+          : '<span class="badge" style="background:#fef9c3; color:#854d0e; border:1px solid #fef08a;">複方</span>';
+
+        // Species summary
+        const speciesTags = (p.speciesIndications || []).map(sp => {
+          const rawName = SPECIES_NAMES_ZH[sp.species] || sp.species;
+          const name = escapeHtml(rawName);
+          let restr = '';
+          if (sp.restrictions && sp.restrictions.includes('not-laying-hens')) {
+            restr = ' <span style="color:#b45309;">(不含產蛋中之蛋雞)</span>';
+          } else if (sp.restrictions && sp.restrictions.includes('not-laying-ducks')) {
+            restr = ' <span style="color:#b45309;">(不含產蛋中之蛋鴨)</span>';
+          }
+          return `<span style="font-size:0.85rem; background:#f9fafb; border:1px solid #e5e7eb; padding:0.15rem 0.4rem; border-radius:4px; display:inline-block; margin-right:0.3rem; margin-bottom:0.25rem;">${name}${restr}</span>`;
+        }).slice(0, 8).join('');
+
+        // Ingredient links
+        const ingLinks = (p.ingredients || []).map(ing => {
+          const slug = ing.slug || ing.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+          const ingZh = ing.chineseName ? ` (${escapeHtml(ing.chineseName)})` : '';
+          return `<a href="${ingredientUrl(slug)}" style="font-weight:600; margin-right:0.4rem;">${escapeHtml(ing.name)}${ingZh}</a>`;
+        }).join('');
+
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.25rem;">
+                ${statusTag}
+                ${originTag}
+                ${singleTag}
+                <span style="font-size:0.8rem; color:#6b7280;">${escapeHtml(p.licenseNo)}</span>
+              </div>
+              <a href="${drugUrl(p.slug)}" style="font-size:1.15rem; font-weight:700; color:#111827; text-decoration:none;">${escapeHtml(p.nameZh)}</a>
+              ${p.nameEn ? `<div style="font-size:0.85rem; color:#6b7280;">${escapeHtml(p.nameEn)}</div>` : ''}
+            </div>
+
+            <label style="display:flex; align-items:center; gap:0.3rem; font-size:0.8rem; cursor:pointer; background:#f9fafb; padding:0.3rem 0.5rem; border-radius:4px; border:1px solid #e5e7eb; white-space:nowrap;">
+              <input type="checkbox" class="compare-chk" data-slug="${escapeHtml(p.slug)}" ${isCompared ? 'checked' : ''} />
+              <span>比較</span>
+            </label>
+          </div>
+
+          <div style="font-size:0.85rem; color:#374151; display:flex; flex-wrap:wrap; gap:1rem;">
+            <span>劑型：<strong>${escapeHtml(p.dosageFormCategory)}</strong></span>
+            <span>業者：<strong>${escapeHtml(p.vendorName || '未載明')}</strong></span>
+            <span>效期：${escapeHtml(p.expiryDate || '未載明')}</span>
+          </div>
+
+          <div style="font-size:0.85rem; color:#4b5563; border-top:1px dashed #e5e7eb; padding-top:0.4rem;">
+            成分：${ingLinks || '無標準成分'}
+          </div>
+
+          ${speciesTags ? `<div style="border-top:1px dashed #e5e7eb; padding-top:0.4rem;">物種：${speciesTags}</div>` : ''}
+        `;
+
+        const chk = card.querySelector('.compare-chk');
+        if (chk) {
+          chk.addEventListener('change', (e) => {
+            toggleCompare(p.slug, e.target.checked);
+          });
+        }
+
+        container.appendChild(card);
+      }
+
+      // Pagination
+      const totalPages = Math.ceil(currentFilteredList.length / PAGE_SIZE);
+      const paginationBar = document.getElementById('pagination-bar');
+      const pageIndicator = document.getElementById('page-indicator');
+      const prevBtn = document.getElementById('prev-page-btn');
+      const nextBtn = document.getElementById('next-page-btn');
+
+      if (totalPages > 1) {
+        paginationBar.style.display = 'flex';
+        pageIndicator.textContent = `第 ${currentPage} / ${totalPages} 頁 (共 ${currentFilteredList.length} 筆)`;
+        prevBtn.disabled = currentPage <= 1;
+        nextBtn.disabled = currentPage >= totalPages;
+      } else {
+        paginationBar.style.display = 'none';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      restoreStateFromUrl();
+
+      const searchInput = document.getElementById('search-input');
+      const p = new URLSearchParams(window.location.search);
+
+      // Lazy load index on first focus OR if query param exists (Task 9.3)
+      if (p.toString().length > 0) {
+        runSearchAndFilter();
+      } else {
+        searchInput.addEventListener('focus', () => {
+          if (!isIndexLoaded) {
+            runSearchAndFilter();
+          }
+        }, { once: true });
+      }
+
+      // Input debounce
+      let debounceTimer = null;
+      searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          runSearchAndFilter();
+        }, 200);
+      });
+
+      // Filter change events
+      const filterIds = [
+        'filter-species', 'filter-dosage', 'filter-ingredient-type',
+        'filter-origin', 'filter-include-expired', 'filter-include-biologic',
+        'filter-include-raw', 'filter-include-export'
+      ];
+      filterIds.forEach(id => {
+        document.getElementById(id)?.addEventListener('change', () => {
+          expandRestrictedLaying = false;
+          runSearchAndFilter();
+        });
+      });
+
+      // Reset filters
+      document.getElementById('reset-filter-btn')?.addEventListener('click', () => {
+        document.getElementById('search-input').value = '';
+        document.getElementById('filter-species').value = '';
+        document.getElementById('filter-dosage').value = '';
+        document.getElementById('filter-ingredient-type').value = 'all';
+        document.getElementById('filter-origin').value = 'all';
+        document.getElementById('filter-include-expired').checked = false;
+        document.getElementById('filter-include-biologic').checked = false;
+        document.getElementById('filter-include-raw').checked = false;
+        document.getElementById('filter-include-export').checked = false;
+        expandRestrictedLaying = false;
+        runSearchAndFilter();
+      });
+
+      // Toggle mobile filter panel
+      const toggleBtn = document.getElementById('toggle-filter-btn');
+      const filterPanel = document.getElementById('filter-panel');
+      if (toggleBtn && filterPanel) {
+        toggleBtn.addEventListener('click', () => {
+          filterPanel.classList.toggle('show-mobile');
+          toggleBtn.textContent = filterPanel.classList.contains('show-mobile') ? '收合篩選條件 ▴' : '🔍 展開篩選條件 ▾';
+        });
+      }
+
+      // Quick show expired
+      document.getElementById('quick-show-expired-btn')?.addEventListener('click', () => {
+        document.getElementById('filter-include-expired').checked = true;
+        runSearchAndFilter();
+      });
+
+      // Toggle laying hens/ducks restricted
+      document.getElementById('toggle-laying-btn')?.addEventListener('click', () => {
+        expandRestrictedLaying = !expandRestrictedLaying;
+        runSearchAndFilter();
+      });
+
+      // Pagination events
+      document.getElementById('prev-page-btn')?.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderPage();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+      document.getElementById('next-page-btn')?.addEventListener('click', () => {
+        const totalPages = Math.ceil(currentFilteredList.length / PAGE_SIZE);
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderPage();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+
+      // Re-sync compare checkboxes when compare list changes
+      window.addEventListener('compare-updated', () => {
+        const list = getCompareList();
+        document.querySelectorAll('.compare-chk').forEach(chk => {
+          const s = chk.getAttribute('data-slug');
+          chk.checked = list.includes(s);
+        });
+      });
+    });
+  </script>
+</Layout>

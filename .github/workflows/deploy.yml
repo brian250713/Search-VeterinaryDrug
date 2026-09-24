@@ -1,0 +1,107 @@
+name: Deploy Veterinary Drug Search to GitHub Pages
+
+on:
+  schedule:
+    - cron: '0 2 * * 1' # 每週一 02:00 UTC 自動抓取與建置
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.32.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: 1. Fetch data from MOA API
+        run: pnpm fetch
+
+      - name: 2. Normalize and build search index
+        run: pnpm normalize
+
+      - name: 3. Run unit tests
+        run: pnpm test
+
+      - name: 4. Build Astro static site
+        run: pnpm build
+
+      - name: 5. Verify release
+        run: pnpm verify
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  update-baseline:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.32.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Fetch and update baseline
+        run: |
+          pnpm fetch
+          pnpm tsx scripts/update-baseline.ts
+
+      - name: Commit & push updated baseline
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/baseline.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore(data): update baseline.json [skip ci]"
+          git push

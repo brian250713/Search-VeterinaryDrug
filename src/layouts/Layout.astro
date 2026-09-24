@@ -1,0 +1,130 @@
+---
+import metaData from '../../data/meta.json';
+import '../styles/global.css';
+import { withBase } from '../lib/url';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = '動物用藥品資訊查詢 - 獸醫與養殖戶開放資料工具',
+  description = '提供農業部動物用藥資訊查詢、同成分產品比較、物種與蛋雞蛋鴨使用限制標記。',
+} = Astro.props;
+
+const fetchDate = metaData.fetchedAt ? metaData.fetchedAt.split('T')[0] : '2026-09-23';
+const totalCount = metaData.totalRecords ? metaData.totalRecords.toLocaleString() : '13,737';
+---
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💊</text></svg>">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-inner">
+        <a href={withBase('/')} class="site-logo">
+          <span>🐾</span>
+          <span>動物用藥資訊</span>
+        </a>
+        <nav class="nav-links">
+          <a href={withBase('/')}>藥品搜尋</a>
+          <a href={withBase('/ingredients')}>成分總覽</a>
+          <a href={withBase('/compare')} id="header-compare-link">比較清單</a>
+          <a href={withBase('/about-data')}>關於資料</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <!-- 浮動比較列 -->
+    <div id="compare-bar" class="compare-float-bar" style="display: none;">
+      <span>已選擇 <strong id="compare-count">0</strong> / 3 項產品</span>
+      <a href={withBase('/compare')} id="compare-bar-btn" class="btn btn-primary" style="padding: 0.35rem 0.8rem; font-size: 0.85rem;">前往比較表 →</a>
+      <button id="compare-clear-btn" style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 0.8rem;">清除</button>
+    </div>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-disclaimer">
+          <strong>⚠️ 免責聲明：</strong>
+          本站內容整理自政府開放資料、僅供查詢參考、不構成用藥建議，用藥應遵從獸醫師指示並以主管機關公告為準。
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; align-items: center;">
+          <div>
+            <p>
+              資料來源：
+              <a href="https://data.moa.gov.tw/dataset/adprodata" target="_blank" rel="noopener noreferrer">
+                農業部動植物防疫檢疫署「動物用藥資訊」開放資料
+              </a>
+              （遵循<a href="https://data.gov.tw/license" target="_blank" rel="noopener noreferrer">政府資料開放授權條款</a>）
+            </p>
+            <p style="margin-top: 0.25rem;">
+              資料擷取於 {fetchDate}，共 {totalCount} 筆許可證。
+            </p>
+          </div>
+          <div>
+            <a href={withBase('/about-data')}>深入了解：資料處理與抽取說明 →</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script is:inline>
+      function updateCompareBar() {
+        try {
+          const raw = localStorage.getItem('vet_drug_compare_list');
+          const list = raw ? JSON.parse(raw) : [];
+          const count = Array.isArray(list) ? list.length : 0;
+          const bar = document.getElementById('compare-bar');
+          const countEl = document.getElementById('compare-count');
+          const headerLink = document.getElementById('header-compare-link');
+
+          if (headerLink) {
+            headerLink.textContent = count > 0 ? `比較 (${count})` : '比較清單';
+          }
+
+          if (bar && countEl) {
+            if (count > 0) {
+              bar.style.display = 'flex';
+              countEl.textContent = count;
+            } else {
+              bar.style.display = 'none';
+            }
+          }
+        } catch (e) {
+          // LocalStorage fallback
+        }
+      }
+
+      window.addEventListener('DOMContentLoaded', () => {
+        updateCompareBar();
+        window.addEventListener('storage', updateCompareBar);
+        window.addEventListener('compare-updated', updateCompareBar);
+
+        const clearBtn = document.getElementById('compare-clear-btn');
+        if (clearBtn) {
+          clearBtn.addEventListener('click', () => {
+            try {
+              localStorage.setItem('vet_drug_compare_list', JSON.stringify([]));
+              window.dispatchEvent(new Event('compare-updated'));
+            } catch (e) {}
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

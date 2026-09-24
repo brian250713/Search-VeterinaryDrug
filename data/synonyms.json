@@ -1,0 +1,1773 @@
+[
+  {
+    "slug": "vitamin-b2",
+    "name": "VITAMIN B2",
+    "chineseName": "維生素B2",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 944
+  },
+  {
+    "slug": "vitamin-a",
+    "name": "VITAMIN A",
+    "chineseName": "維生素A",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 868
+  },
+  {
+    "slug": "vitamin-e",
+    "name": "VITAMIN E",
+    "chineseName": "維生素E",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 822
+  },
+  {
+    "slug": "vitamin-b12",
+    "name": "VITAMIN B12",
+    "chineseName": "維生素B12",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 808
+  },
+  {
+    "slug": "vitamin-b1",
+    "name": "VITAMIN B1",
+    "chineseName": "維生素B1",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 769
+  },
+  {
+    "slug": "vitamin-d3",
+    "name": "VITAMIN D3",
+    "chineseName": "維生素D3",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 713
+  },
+  {
+    "slug": "vitamin-b6",
+    "name": "VITAMIN B6",
+    "chineseName": "維生素B6",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 642
+  },
+  {
+    "slug": "tylosin",
+    "name": "TYLOSIN",
+    "chineseName": "泰樂黴素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 451
+  },
+  {
+    "slug": "folic-acid",
+    "name": "FOLIC ACID",
+    "chineseName": "葉酸",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 448
+  },
+  {
+    "slug": "oxytetracycline",
+    "name": "OXYTETRACYCLINE",
+    "chineseName": "羥四環黴素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 439
+  },
+  {
+    "slug": "nicotinamide",
+    "name": "NICOTINAMIDE",
+    "chineseName": "菸鹼醯胺",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 435
+  },
+  {
+    "slug": "chloramphenicol",
+    "name": "CHLORAMPHENICOL",
+    "chineseName": "氯黴素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 418
+  },
+  {
+    "slug": "calcium-pantothenate",
+    "name": "CALCIUM PANTOTHENATE",
+    "chineseName": "泛酸鈣",
+    "aliases": [
+      "CAL. PANTOTHENATE"
+    ],
+    "verified": true,
+    "sampleCount": 380
+  },
+  {
+    "slug": "trimethoprim",
+    "name": "TRIMETHOPRIM",
+    "chineseName": "甲氧苄啶",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 332
+  },
+  {
+    "slug": "lincomycin",
+    "name": "LINCOMYCIN",
+    "chineseName": "林可黴素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 318
+  },
+  {
+    "slug": "dl-methionine",
+    "name": "DL-METHIONINE",
+    "chineseName": "甲硫胺酸",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 318
+  },
+  {
+    "slug": "chlortetracycline",
+    "name": "CHLORTETRACYCLINE",
+    "chineseName": "氯四環黴素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 315
+  },
+  {
+    "slug": "copper",
+    "name": "COPPER",
+    "chineseName": "銅",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 305
+  },
+  {
+    "slug": "vitamin-k3",
+    "name": "VITAMIN K3",
+    "chineseName": "維生素K3",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 304
+  },
+  {
+    "slug": "manganese",
+    "name": "MANGANESE",
+    "chineseName": "錳",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 292
+  },
+  {
+    "slug": "sulfamethazine",
+    "name": "SULFAMETHAZINE",
+    "chineseName": "磺胺二甲嘧啶",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 290
+  },
+  {
+    "slug": "sulfadimethoxine",
+    "name": "SULFADIMETHOXINE",
+    "chineseName": "磺胺二甲氧嘧啶",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 284
+  },
+  {
+    "slug": "iron",
+    "name": "IRON",
+    "chineseName": "鐵",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 281
+  },
+  {
+    "slug": "neomycin",
+    "name": "NEOMYCIN",
+    "chineseName": "新黴素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 266
+  },
+  {
+    "slug": "vitamin-k",
+    "name": "VITAMIN K",
+    "chineseName": "維生素K",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 266
+  },
+  {
+    "slug": "pantothenic-acid",
+    "name": "PANTOTHENIC ACID",
+    "chineseName": "泛酸",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 261
+  },
+  {
+    "slug": "nicotinic-acid",
+    "name": "NICOTINIC ACID",
+    "chineseName": "菸鹼酸",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 257
+  },
+  {
+    "slug": "choline-chloride",
+    "name": "CHOLINE CHLORIDE",
+    "chineseName": "氯化膽鹼",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 252
+  },
+  {
+    "slug": "penicillin-g-procaine",
+    "name": "PENICILLIN G PROCAINE",
+    "chineseName": "普魯卡因青黴素G",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 249
+  },
+  {
+    "slug": "vitamin-c",
+    "name": "VITAMIN C",
+    "chineseName": "維生素C",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 246
+  },
+  {
+    "slug": "ampicillin",
+    "name": "AMPICILLIN",
+    "chineseName": "安比西林",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 244
+  },
+  {
+    "slug": "cobalt",
+    "name": "COBALT",
+    "chineseName": "鈷",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 240
+  },
+  {
+    "slug": "iodine",
+    "name": "IODINE",
+    "chineseName": "碘",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 226
+  },
+  {
+    "slug": "sulpyrin",
+    "name": "SULPYRIN",
+    "chineseName": "安乃近",
+    "aliases": [
+      "DIPYRONE",
+      "METAMIZOLE"
+    ],
+    "verified": true,
+    "sampleCount": 225
+  },
+  {
+    "slug": "amoxicillin",
+    "name": "AMOXICILLIN",
+    "chineseName": "阿莫西林",
+    "aliases": [
+      "AMOXYCILLIN"
+    ],
+    "verified": true,
+    "sampleCount": 223
+  },
+  {
+    "slug": "kanamycin",
+    "name": "KANAMYCIN",
+    "chineseName": "卡那黴素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 219
+  },
+  {
+    "slug": "doxycycline",
+    "name": "DOXYCYCLINE",
+    "chineseName": "多西環素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 204
+  },
+  {
+    "slug": "streptomycin",
+    "name": "STREPTOMYCIN",
+    "chineseName": "鏈黴素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 197
+  },
+  {
+    "slug": "carbadox",
+    "name": "CARBADOX",
+    "chineseName": "卡巴多",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 195
+  },
+  {
+    "slug": "biotin",
+    "name": "BIOTIN",
+    "chineseName": "生物素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 195
+  },
+  {
+    "slug": "sulfaquinoxaline",
+    "name": "SULFAQUINOXALINE",
+    "chineseName": "磺胺喹㗁啉",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 185
+  },
+  {
+    "slug": "prednisolone",
+    "name": "PREDNISOLONE",
+    "chineseName": "培尼皮質醇",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 183
+  },
+  {
+    "slug": "sulfamonomethoxine",
+    "name": "SULFAMONOMETHOXINE",
+    "chineseName": "磺胺單甲氧嘧啶",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 179
+  },
+  {
+    "slug": "spectinomycin",
+    "name": "SPECTINOMYCIN",
+    "chineseName": "觀黴素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 170
+  },
+  {
+    "slug": "florfenicol",
+    "name": "FLORFENICOL",
+    "chineseName": "氟苯尼考",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 167
+  },
+  {
+    "slug": "amprolium",
+    "name": "AMPROLIUM",
+    "chineseName": "安保寧",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 156
+  },
+  {
+    "slug": "dexamethasone",
+    "name": "DEXAMETHASONE",
+    "chineseName": "地塞米松",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 154
+  },
+  {
+    "slug": "selenium",
+    "name": "SELENIUM",
+    "chineseName": "硒",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 149
+  },
+  {
+    "slug": "colistin",
+    "name": "COLISTIN",
+    "chineseName": "可利斯汀",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 148
+  },
+  {
+    "slug": "tiamulin-hydrogen",
+    "name": "TIAMULIN HYDROGEN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 146
+  },
+  {
+    "slug": "sulfadiazine",
+    "name": "SULFADIAZINE",
+    "chineseName": "磺胺嘧啶",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 139
+  },
+  {
+    "slug": "ronidazole",
+    "name": "RONIDAZOLE",
+    "chineseName": "羅硝唑",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 135
+  },
+  {
+    "slug": "erythromycin-thiocyanate",
+    "name": "ERYTHROMYCIN THIOCYANATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 133
+  },
+  {
+    "slug": "flumequine",
+    "name": "FLUMEQUINE",
+    "chineseName": "氟甲喹",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 128
+  },
+  {
+    "slug": "pyrimethamine",
+    "name": "PYRIMETHAMINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 123
+  },
+  {
+    "slug": "niacin",
+    "name": "NIACIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 120
+  },
+  {
+    "slug": "dihydrostreptomycin",
+    "name": "DIHYDROSTREPTOMYCIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 116
+  },
+  {
+    "slug": "olaquindox",
+    "name": "OLAQUINDOX",
+    "chineseName": "乙醯甲喹",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 108
+  },
+  {
+    "slug": "tetracycline",
+    "name": "TETRACYCLINE",
+    "chineseName": "四環黴素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 107
+  },
+  {
+    "slug": "sulfathiazole",
+    "name": "SULFATHIAZOLE",
+    "chineseName": "磺胺噻唑",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 107
+  },
+  {
+    "slug": "ivermectin",
+    "name": "IVERMECTIN",
+    "chineseName": "伊維菌素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 104
+  },
+  {
+    "slug": "furazolidone",
+    "name": "FURAZOLIDONE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 104
+  },
+  {
+    "slug": "chlorpheniramine",
+    "name": "CHLORPHENIRAMINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 101
+  },
+  {
+    "slug": "gentamicin",
+    "name": "GENTAMICIN",
+    "chineseName": "慶大黴素",
+    "aliases": [
+      "GENTAMYCIN"
+    ],
+    "verified": true,
+    "sampleCount": 99
+  },
+  {
+    "slug": "vitamin-d",
+    "name": "VITAMIN D",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 99
+  },
+  {
+    "slug": "sulfamethoxypyridazine",
+    "name": "SULFAMETHOXYPYRIDAZINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 95
+  },
+  {
+    "slug": "dimetridazole",
+    "name": "DIMETRIDAZOLE",
+    "chineseName": "二甲硝咪唑",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 91
+  },
+  {
+    "slug": "menadione-sod-bisulfite",
+    "name": "MENADIONE SOD. BISULFITE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 88
+  },
+  {
+    "slug": "enrofloxacin",
+    "name": "ENROFLOXACIN",
+    "chineseName": "恩氟喹啉",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 86
+  },
+  {
+    "slug": "sulfamethoxazole",
+    "name": "SULFAMETHOXAZOLE",
+    "chineseName": "磺胺甲㗁唑",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 85
+  },
+  {
+    "slug": "ceftiofur",
+    "name": "CEFTIOFUR",
+    "chineseName": "賽福妥",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 85
+  },
+  {
+    "slug": "dextrose",
+    "name": "DEXTROSE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 83
+  },
+  {
+    "slug": "dl-methylephedrine",
+    "name": "DL-METHYLEPHEDRINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 81
+  },
+  {
+    "slug": "piperazine-adipate",
+    "name": "PIPERAZINE ADIPATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 80
+  },
+  {
+    "slug": "choline",
+    "name": "CHOLINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 80
+  },
+  {
+    "slug": "chloride",
+    "name": "CHLORIDE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 76
+  },
+  {
+    "slug": "furaltadone",
+    "name": "FURALTADONE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 75
+  },
+  {
+    "slug": "magnesium",
+    "name": "MAGNESIUM",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 73
+  },
+  {
+    "slug": "sulfamerazine",
+    "name": "SULFAMERAZINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 73
+  },
+  {
+    "slug": "spiramycin-adipate",
+    "name": "SPIRAMYCIN ADIPATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 73
+  },
+  {
+    "slug": "lidocaine",
+    "name": "LIDOCAINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 72
+  },
+  {
+    "slug": "trichlorfon",
+    "name": "TRICHLORFON",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 71
+  },
+  {
+    "slug": "spiramycin",
+    "name": "SPIRAMYCIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 70
+  },
+  {
+    "slug": "erythromycin",
+    "name": "ERYTHROMYCIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 69
+  },
+  {
+    "slug": "dexamethasone-sod",
+    "name": "DEXAMETHASONE SOD",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 69
+  },
+  {
+    "slug": "ethopabate",
+    "name": "ETHOPABATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 68
+  },
+  {
+    "slug": "sod-benzoate",
+    "name": "SOD. BENZOATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 68
+  },
+  {
+    "slug": "aminopyrine",
+    "name": "AMINOPYRINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 68
+  },
+  {
+    "slug": "bacitracin",
+    "name": "BACITRACIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 68
+  },
+  {
+    "slug": "cal",
+    "name": "CAL",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 67
+  },
+  {
+    "slug": "caffeine-amp",
+    "name": "CAFFEINE &AMP",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 66
+  },
+  {
+    "slug": "diaveridine",
+    "name": "DIAVERIDINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 66
+  },
+  {
+    "slug": "nitrovin",
+    "name": "NITROVIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 66
+  },
+  {
+    "slug": "procaine-penicillin-g",
+    "name": "PROCAINE PENICILLIN G",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 65
+  },
+  {
+    "slug": "ferrous",
+    "name": "FERROUS",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 65
+  },
+  {
+    "slug": "sulfachlorpyridazine",
+    "name": "SULFACHLORPYRIDAZINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 64
+  },
+  {
+    "slug": "iron-dextran",
+    "name": "IRON DEXTRAN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 63
+  },
+  {
+    "slug": "benzalkonium-chloride",
+    "name": "BENZALKONIUM CHLORIDE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 62
+  },
+  {
+    "slug": "nystatin",
+    "name": "NYSTATIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 62
+  },
+  {
+    "slug": "oxolinic-acid",
+    "name": "OXOLINIC ACID",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 59
+  },
+  {
+    "slug": "arsanilic-acid",
+    "name": "ARSANILIC ACID",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 58
+  },
+  {
+    "slug": "glucose",
+    "name": "GLUCOSE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 58
+  },
+  {
+    "slug": "thiamphenicol",
+    "name": "THIAMPHENICOL",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 57
+  },
+  {
+    "slug": "berberine",
+    "name": "BERBERINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 57
+  },
+  {
+    "slug": "lactose",
+    "name": "LACTOSE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 56
+  },
+  {
+    "slug": "cefalexin",
+    "name": "CEFALEXIN",
+    "chineseName": "頭孢氨苄",
+    "aliases": [
+      "CEPHALEXIN"
+    ],
+    "verified": true,
+    "sampleCount": 55
+  },
+  {
+    "slug": "tilmicosin",
+    "name": "TILMICOSIN",
+    "chineseName": "替米考星",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 54
+  },
+  {
+    "slug": "penicillin-g",
+    "name": "PENICILLIN G",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 53
+  },
+  {
+    "slug": "oxytocin",
+    "name": "OXYTOCIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 52
+  },
+  {
+    "slug": "inositol",
+    "name": "INOSITOL",
+    "chineseName": "肌醇",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 52
+  },
+  {
+    "slug": "levamisole",
+    "name": "LEVAMISOLE",
+    "chineseName": "左旋咪唑",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 52
+  },
+  {
+    "slug": "sod-chloride",
+    "name": "SOD. CHLORIDE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 51
+  },
+  {
+    "slug": "pyrantel-pamoate",
+    "name": "PYRANTEL PAMOATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 50
+  },
+  {
+    "slug": "chlortetracycline-cal-complex",
+    "name": "CHLORTETRACYCLINE CAL. COMPLEX",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 50
+  },
+  {
+    "slug": "fipronil",
+    "name": "FIPRONIL",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 47
+  },
+  {
+    "slug": "caffeine",
+    "name": "CAFFEINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 47
+  },
+  {
+    "slug": "l-lysine",
+    "name": "L-LYSINE",
+    "chineseName": "離胺酸",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 47
+  },
+  {
+    "slug": "nicarbazin",
+    "name": "NICARBAZIN",
+    "chineseName": "尼卡巴嗪",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 46
+  },
+  {
+    "slug": "tetramisole",
+    "name": "TETRAMISOLE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 46
+  },
+  {
+    "slug": "methionine",
+    "name": "METHIONINE",
+    "chineseName": "甲硫胺酸",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 46
+  },
+  {
+    "slug": "benzyl-alcohol",
+    "name": "BENZYL ALCOHOL",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 44
+  },
+  {
+    "slug": "toltrazuril",
+    "name": "TOLTRAZURIL",
+    "chineseName": "托曲珠利",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 43
+  },
+  {
+    "slug": "salinomycin",
+    "name": "SALINOMYCIN",
+    "chineseName": "沙利黴素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 43
+  },
+  {
+    "slug": "guaiacol-glyceryl-ether",
+    "name": "GUAIACOL GLYCERYL ETHER",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 42
+  },
+  {
+    "slug": "milbemycin-oxime",
+    "name": "MILBEMYCIN OXIME",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 41
+  },
+  {
+    "slug": "iodide",
+    "name": "IODIDE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 41
+  },
+  {
+    "slug": "spiramycin-embonate",
+    "name": "SPIRAMYCIN EMBONATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 38
+  },
+  {
+    "slug": "d-pantothenic-acid",
+    "name": "D-PANTOTHENIC ACID",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 36
+  },
+  {
+    "slug": "cephalothin",
+    "name": "CEPHALOTHIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 36
+  },
+  {
+    "slug": "triamcinolone-acetonide",
+    "name": "TRIAMCINOLONE ACETONIDE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 35
+  },
+  {
+    "slug": "sulfaguanidine",
+    "name": "SULFAGUANIDINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 35
+  },
+  {
+    "slug": "pyrabital",
+    "name": "PYRABITAL",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 35
+  },
+  {
+    "slug": "dextromethorphan-hbr",
+    "name": "DEXTROMETHORPHAN HBR",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 34
+  },
+  {
+    "slug": "sulfadimidine",
+    "name": "SULFADIMIDINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 34
+  },
+  {
+    "slug": "lysine",
+    "name": "LYSINE",
+    "chineseName": "離胺酸",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 34
+  },
+  {
+    "slug": "vitamin-a-palmitate",
+    "name": "VITAMIN A PALMITATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 34
+  },
+  {
+    "slug": "cupric",
+    "name": "CUPRIC",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 34
+  },
+  {
+    "slug": "piperazine",
+    "name": "PIPERAZINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 33
+  },
+  {
+    "slug": "ethoxyquin",
+    "name": "ETHOXYQUIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 33
+  },
+  {
+    "slug": "taurine",
+    "name": "TAURINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 33
+  },
+  {
+    "slug": "water-for-injection-add-to",
+    "name": "WATER FOR INJECTION ADD TO",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 33
+  },
+  {
+    "slug": "acrinol",
+    "name": "ACRINOL",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 32
+  },
+  {
+    "slug": "halquinol",
+    "name": "HALQUINOL",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 31
+  },
+  {
+    "slug": "yeast",
+    "name": "YEAST",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 31
+  },
+  {
+    "slug": "pantothenate",
+    "name": "PANTOTHENATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 31
+  },
+  {
+    "slug": "thiamine",
+    "name": "THIAMINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 31
+  },
+  {
+    "slug": "phosphorus",
+    "name": "PHOSPHORUS",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 30
+  },
+  {
+    "slug": "bismuth-subnitrate",
+    "name": "BISMUTH SUBNITRATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 30
+  },
+  {
+    "slug": "povidone-iodine",
+    "name": "POVIDONE IODINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 29
+  },
+  {
+    "slug": "sulfisoxazole",
+    "name": "SULFISOXAZOLE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 29
+  },
+  {
+    "slug": "choline-bitartrate",
+    "name": "CHOLINE BITARTRATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 29
+  },
+  {
+    "slug": "nalidixic-acid",
+    "name": "NALIDIXIC ACID",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 29
+  },
+  {
+    "slug": "neostigmine-methylsulfate",
+    "name": "NEOSTIGMINE METHYLSULFATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 29
+  },
+  {
+    "slug": "cyanocobalamin",
+    "name": "CYANOCOBALAMIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 29
+  },
+  {
+    "slug": "kitasamycin",
+    "name": "KITASAMYCIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 28
+  },
+  {
+    "slug": "sod-bicarbonate",
+    "name": "SOD. BICARBONATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 28
+  },
+  {
+    "slug": "roxarsone",
+    "name": "ROXARSONE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 28
+  },
+  {
+    "slug": "lactose-add-to",
+    "name": "LACTOSE ADD TO",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 28
+  },
+  {
+    "slug": "permethrin",
+    "name": "PERMETHRIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 27
+  },
+  {
+    "slug": "cal-carbonate",
+    "name": "CAL. CARBONATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 27
+  },
+  {
+    "slug": "magnesium-chloride",
+    "name": "MAGNESIUM CHLORIDE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 27
+  },
+  {
+    "slug": "praziquantel",
+    "name": "PRAZIQUANTEL",
+    "chineseName": "吡喹酮",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 26
+  },
+  {
+    "slug": "chloramphenicol-sod",
+    "name": "CHLORAMPHENICOL SOD",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 26
+  },
+  {
+    "slug": "niacinamide",
+    "name": "NIACINAMIDE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 26
+  },
+  {
+    "slug": "sulfisomidine",
+    "name": "SULFISOMIDINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 26
+  },
+  {
+    "slug": "estradiol-benzoate",
+    "name": "ESTRADIOL BENZOATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 26
+  },
+  {
+    "slug": "clopidol",
+    "name": "CLOPIDOL",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 25
+  },
+  {
+    "slug": "ferric",
+    "name": "FERRIC",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 25
+  },
+  {
+    "slug": "cal-gluconate",
+    "name": "CAL. GLUCONATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 25
+  },
+  {
+    "slug": "mebendazole",
+    "name": "MEBENDAZOLE",
+    "chineseName": "甲苯達唑",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 25
+  },
+  {
+    "slug": "moxidectin",
+    "name": "MOXIDECTIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 24
+  },
+  {
+    "slug": "maduramicin-ammonium",
+    "name": "MADURAMICIN AMMONIUM",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 24
+  },
+  {
+    "slug": "flubendazole",
+    "name": "FLUBENDAZOLE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 24
+  },
+  {
+    "slug": "sod",
+    "name": "SOD",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 24
+  },
+  {
+    "slug": "virginiamycin",
+    "name": "VIRGINIAMYCIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 24
+  },
+  {
+    "slug": "acetylisovaleryltylosin",
+    "name": "ACETYLISOVALERYLTYLOSIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 23
+  },
+  {
+    "slug": "sulfachloropyrazine",
+    "name": "SULFACHLOROPYRAZINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 23
+  },
+  {
+    "slug": "fluralaner",
+    "name": "FLURALANER",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 23
+  },
+  {
+    "slug": "diphenhydramine",
+    "name": "DIPHENHYDRAMINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 23
+  },
+  {
+    "slug": "carprofen",
+    "name": "CARPROFEN",
+    "chineseName": "卡洛芬",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 23
+  },
+  {
+    "slug": "sulfachlorpyrazine",
+    "name": "SULFACHLORPYRAZINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 23
+  },
+  {
+    "slug": "chorionic-gonadotropin",
+    "name": "CHORIONIC GONADOTROPIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 23
+  },
+  {
+    "slug": "miconazole",
+    "name": "MICONAZOLE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 22
+  },
+  {
+    "slug": "phenylbutazone",
+    "name": "PHENYLBUTAZONE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 22
+  },
+  {
+    "slug": "propylene-glycol",
+    "name": "PROPYLENE GLYCOL",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 22
+  },
+  {
+    "slug": "tiamulin",
+    "name": "TIAMULIN",
+    "chineseName": "泰妙素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 21
+  },
+  {
+    "slug": "apramycin",
+    "name": "APRAMYCIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 21
+  },
+  {
+    "slug": "progesterone",
+    "name": "PROGESTERONE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 21
+  },
+  {
+    "slug": "sod-salicylate",
+    "name": "SOD. SALICYLATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 21
+  },
+  {
+    "slug": "cal-dibasic",
+    "name": "CAL.  DIBASIC",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 21
+  },
+  {
+    "slug": "albumin-tannate",
+    "name": "ALBUMIN TANNATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 21
+  },
+  {
+    "slug": "phenol",
+    "name": "PHENOL",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 20
+  },
+  {
+    "slug": "cloxacillin",
+    "name": "CLOXACILLIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 20
+  },
+  {
+    "slug": "orotic-acid",
+    "name": "OROTIC ACID",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 20
+  },
+  {
+    "slug": "pyridoxine",
+    "name": "PYRIDOXINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 20
+  },
+  {
+    "slug": "tulathromycin",
+    "name": "TULATHROMYCIN",
+    "chineseName": "土拉黴素",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 19
+  },
+  {
+    "slug": "spectinomycin-tetrahydrate",
+    "name": "SPECTINOMYCIN  TETRAHYDRATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 19
+  },
+  {
+    "slug": "sulfachloropyridazine",
+    "name": "SULFACHLOROPYRIDAZINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 19
+  },
+  {
+    "slug": "cobalt-chloride",
+    "name": "COBALT CHLORIDE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 19
+  },
+  {
+    "slug": "p-amino-benzoic-acid",
+    "name": "P-AMINO BENZOIC ACID",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 19
+  },
+  {
+    "slug": "bisulfite",
+    "name": "BISULFITE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 19
+  },
+  {
+    "slug": "glutaraldehyde",
+    "name": "GLUTARALDEHYDE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 18
+  },
+  {
+    "slug": "febantel",
+    "name": "FEBANTEL",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 18
+  },
+  {
+    "slug": "sulpyrine",
+    "name": "SULPYRINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 18
+  },
+  {
+    "slug": "lactomin",
+    "name": "LACTOMIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 18
+  },
+  {
+    "slug": "available-iodine",
+    "name": "AVAILABLE IODINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 18
+  },
+  {
+    "slug": "cephaloridine",
+    "name": "CEPHALORIDINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 18
+  },
+  {
+    "slug": "vitamin-b1-mononitrate",
+    "name": "VITAMIN B1 MONONITRATE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 18
+  },
+  {
+    "slug": "vitamin-k4",
+    "name": "VITAMIN K4",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 18
+  },
+  {
+    "slug": "alinamin",
+    "name": "ALINAMIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 18
+  },
+  {
+    "slug": "atropine",
+    "name": "ATROPINE",
+    "chineseName": "阿托品",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 17
+  },
+  {
+    "slug": "starch",
+    "name": "STARCH",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 17
+  },
+  {
+    "slug": "cal-chloride",
+    "name": "CAL. CHLORIDE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 17
+  },
+  {
+    "slug": "citric-acid",
+    "name": "CITRIC ACID",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 17
+  },
+  {
+    "slug": "vitamin-b1-hno3",
+    "name": "VITAMIN B1 HNO3",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 17
+  },
+  {
+    "slug": "piperazine-dihydrochloride",
+    "name": "PIPERAZINE DIHYDROCHLORIDE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 17
+  },
+  {
+    "slug": "povidone-iodine",
+    "name": "POVIDONE-IODINE",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 17
+  },
+  {
+    "slug": "riboflavin",
+    "name": "RIBOFLAVIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 17
+  },
+  {
+    "slug": "enramycin",
+    "name": "ENRAMYCIN",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 16
+  },
+  {
+    "slug": "maropitant",
+    "name": "MAROPITANT",
+    "chineseName": "",
+    "aliases": [],
+    "verified": true,
+    "sampleCount": 16
+  }
+]

@@ -1,0 +1,34 @@
+# data-attribution Specification
+
+## Purpose
+TBD - created by archiving change add-vet-drug-search-site. Update Purpose after archive.
+## Requirements
+### Requirement: 免責聲明
+每個頁面 SHALL 顯示免責聲明，說明本站內容整理自政府開放資料、僅供查詢參考、不構成用藥建議，用藥應遵從獸醫師指示並以主管機關公告為準。比較頁 MUST 在比較表上方再次顯示簡短版本。
+
+#### Scenario: 一般頁面
+- **WHEN** 使用者開啟任一頁面
+- **THEN** 頁尾顯示免責聲明
+
+#### Scenario: 比較頁
+- **WHEN** 使用者開啟比較頁
+- **THEN** 比較表上方顯示「僅供參考，不構成用藥建議」的提示
+
+### Requirement: 資料來源與授權標示
+每個頁面 SHALL 在頁尾標示資料來源（農業部動植物防疫檢疫署「動物用藥資訊」開放資料，附資料集連結）與授權（政府資料開放授權條款）。網站 MUST 有一個「關於資料」頁，說明資料處理方式：成分與物種為自動抽取、可能有誤，失效與生物製劑等預設排除規則，以及不含停藥期與用法用量。
+
+#### Scenario: 頁尾來源
+- **WHEN** 使用者開啟任一頁面
+- **THEN** 頁尾顯示資料來源名稱、連到 data.moa.gov.tw 資料集頁的連結與授權名稱
+
+#### Scenario: 關於資料頁
+- **WHEN** 使用者開啟「關於資料」頁
+- **THEN** 頁面說明自動抽取的限制、預設排除規則，以及本站不含停藥期與用法用量
+
+### Requirement: 資料更新時間
+每個頁面 SHALL 顯示本版資料的擷取日期與資料筆數。
+
+#### Scenario: 顯示擷取日期
+- **WHEN** 本版資料於 2026-09-23 擷取，共 13,739 筆
+- **THEN** 頁尾顯示「資料擷取於 2026-09-23，共 13,739 筆許可證」
+

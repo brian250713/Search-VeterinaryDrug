@@ -1,0 +1,26 @@
+{
+  "name": "search-veterinary-drug",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "vitest run",
+    "fetch": "tsx scripts/fetch.ts",
+    "normalize": "tsx scripts/normalize.ts && tsx scripts/build-search-index.ts && tsx scripts/build-shards.ts",
+    "lint": "tsc --noEmit",
+    "verify": "tsx scripts/verify-release.ts"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "astro": "^5.4.2",
+    "minisearch": "^7.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.9",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.7"
+  }
+}

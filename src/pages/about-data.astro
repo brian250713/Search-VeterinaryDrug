@@ -1,0 +1,92 @@
+---
+import Layout from '../layouts/Layout.astro';
+import metaData from '../../data/meta.json';
+---
+
+<Layout title="關於資料 - 動物用藥品資訊查詢" description="說明動物用藥資訊的資料來源、自動抽取限制與預設排除邏輯">
+  <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem;">
+    <div>
+      <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: #111827;">關於資料處理與使用說明</h1>
+      <p style="color: #6b7280; font-size: 0.95rem;">
+        本站旨在協助獸醫師、特約獸醫與畜牧水產養殖戶更有效率地檢索合法登記之動物用藥品。以下為資料處理原則與使用注意事項。
+      </p>
+    </div>
+
+    <section class="card" style="display: flex; flex-direction: column; gap: 1rem;">
+      <h2 style="font-size: 1.25rem; color: #047857; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🔍</span>
+        <span>資料來源與統計</span>
+      </h2>
+      <p>
+        本站資料來源為<strong>農業部動植物防疫檢疫署</strong>每週定期公開之「動物用藥資訊」開放資料集（資料集代號：023），資料授權遵循政府資料開放授權條款。
+      </p>
+      <div style="background-color: #f3f4f6; padding: 1rem; border-radius: 6px; font-size: 0.9rem;">
+        <p><strong>目前資料集狀態：</strong></p>
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.25rem;">
+          <li>總收錄許可證數：<strong>{metaData.totalRecords.toLocaleString()}</strong> 筆</li>
+          <li>有效許可證：<strong>{metaData.activeRecords.toLocaleString()}</strong> 筆</li>
+          <li>已失效許可證：<strong>{metaData.expiredRecords.toLocaleString()}</strong> 筆（約佔 {(metaData.expiredRecords / metaData.totalRecords * 100).toFixed(1)}%）</li>
+          <li>效期未載明：<strong>{metaData.unknownRecords.toLocaleString()}</strong> 筆</li>
+          <li>一般處方與非處方藥：<strong>{metaData.generalRecords.toLocaleString()}</strong> 筆</li>
+          <li>生物製劑（疫苗等）：<strong>{metaData.biologicRecords.toLocaleString()}</strong> 筆</li>
+          <li>原料藥：<strong>{metaData.rawMaterialRecords.toLocaleString()}</strong> 筆</li>
+          <li>外銷專用：<strong>{metaData.exportOnlyRecords.toLocaleString()}</strong> 筆</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="card" style="display: flex; flex-direction: column; gap: 1rem;">
+      <h2 style="font-size: 1.25rem; color: #047857; display: flex; align-items: center; gap: 0.5rem;">
+        <span>⚙️</span>
+        <span>成分與物種自動抽取的限制</span>
+      </h2>
+      <p>
+        原始官方資料庫中，「成分」與「效能(適應症)」欄位為自由輸入的非結構化文字，且夾雜 HTML 標籤。
+      </p>
+      <ul style="margin-left: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.95rem;">
+        <li>
+          <strong>成分抽取：</strong>
+          我們透過文字清理、去除劑量濃度、去除賦形劑與鹽類後綴（如 HCL、Sulfate、Trihydrate 等），並比對人工維護之前 200 大成分同義詞字典（如將 AMOXYCILLIN 與 AMOXICILLIN 合併為阿莫西林）。未收錄於同義詞表的成分會標註「未驗證」，且長尾成分可能存在漏抽或切分不完整的情況，請以詳情頁顯示之<strong>成分原文</strong>為準。
+        </li>
+        <li>
+          <strong>物種與適應症切段：</strong>
+          系統以「物種名稱＋冒號」結構將適應症拆解至特定物種（牛、豬、家禽、犬貓、水產各目等）。若無結構化冒號則啟動全文關鍵字輔助識別。
+        </li>
+        <li>
+          <strong>蛋雞／蛋鴨禁忌與限制：</strong>
+          由於蛋品殘留法規嚴格，系統特別對「不含產蛋中之蛋雞/蛋鴨」、「產蛋期禁用」等字樣進行關鍵詞規則解析並保守標記。
+        </li>
+      </ul>
+    </section>
+
+    <section class="card" style="display: flex; flex-direction: column; gap: 1rem;">
+      <h2 style="font-size: 1.25rem; color: #047857; display: flex; align-items: center; gap: 0.5rem;">
+        <span>🚫</span>
+        <span>預設排除規則</span>
+      </h2>
+      <p>
+        為使現場獸醫與養殖戶能快速鎖定目前市面上具備處方參考價值之商品，搜尋列表與成分清單預設採取以下排除策略：
+      </p>
+      <ul style="margin-left: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.95rem;">
+        <li><strong>預設排除已失效藥品：</strong> 已標記已失效或有效期限早於建置日之許可證預設隱藏，避免誤用已停止展延的藥品。</li>
+        <li><strong>預設排除生物製劑與原料藥：</strong> 疫苗類生物製劑（無化學成分標的）與藥廠製劑原料藥預設不混在一般藥品清單內。</li>
+        <li><strong>預設排除外銷專用：</strong> 僅供出口專用之藥品預設隱藏。</li>
+      </ul>
+      <p style="font-size: 0.9rem; color: #4b5563;">
+        💡 您可以在搜尋頁面的「進階篩選」中隨時解除上述限制，展開檢索歷史或特殊許可證。所有產品詳情頁亦均可透過永久網址（slug）直接閱覽。
+      </p>
+    </section>
+
+    <section class="card" style="display: flex; flex-direction: column; gap: 1rem; border-color: #fcd34d; background-color: #fffdf5;">
+      <h2 style="font-size: 1.25rem; color: #b45309; display: flex; align-items: center; gap: 0.5rem;">
+        <span>⚠️</span>
+        <span>不包含的資訊與醫療免責</span>
+      </h2>
+      <ul style="margin-left: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.95rem; color: #78350f;">
+        <li><strong>不含停藥期與用法用量：</strong> 農業部開放資料目前未將停藥期天數與給藥劑量進行結構化開放，請務必參閱原廠藥品仿單標籤。</li>
+        <li><strong>不含價格與通路：</strong> 本站為純公益資訊檢索工具，不涉及商業銷售與經銷商資訊。</li>
+        <li><strong>不具醫療諮詢功能：</strong> 本站提供之資料僅為許可證登記資訊之索引，不對藥品療效提供保證，亦不構成任何獸醫臨床用藥建議。動物罹患疾病請儘速就醫，由合格執業獸醫師進行診斷與投藥處方。</li>
+      </ul>
+    </section>
+  </div>
+</Layout>

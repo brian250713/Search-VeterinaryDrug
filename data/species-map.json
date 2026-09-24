@@ -1,0 +1,35 @@
+{
+  "species": [
+    { "id": "pig", "nameZh": "豬", "aliases": ["豬", "仔豬", "肉豬", "種豬", "母豬", "小豬", "成豬", "肉女豬"] },
+    { "id": "chicken", "nameZh": "雞", "aliases": ["雞", "肉雞", "蛋雞", "小雞", "雛雞", "種雞", "幼雞", "育成雞", "土雞", "產蛋雞"] },
+    { "id": "duck", "nameZh": "鴨", "aliases": ["鴨", "肉鴨", "蛋鴨", "土番鴨", "番鴨", "雛鴨", "產蛋鴨"] },
+    { "id": "goose", "nameZh": "鵝", "aliases": ["鵝", "肉鵝", "雛鵝"] },
+    { "id": "turkey", "nameZh": "火雞", "aliases": ["火雞", "雛火雞"] },
+    { "id": "cattle", "nameZh": "牛", "aliases": ["牛", "乳牛", "肉牛", "犢牛", "水牛", "小牛"] },
+    { "id": "sheep", "nameZh": "羊", "aliases": ["羊", "山羊", "綿羊", "仔羊", "乳羊"] },
+    { "id": "horse", "nameZh": "馬", "aliases": ["馬", "小馬"] },
+    { "id": "dog", "nameZh": "犬", "aliases": ["犬", "狗"] },
+    { "id": "cat", "nameZh": "貓", "aliases": ["貓"] },
+    { "id": "rabbit", "nameZh": "兔", "aliases": ["兔"] },
+    { "id": "pigeon", "nameZh": "鴿", "aliases": ["鴿", "鴿子", "賽鴿"] },
+    { "id": "bee", "nameZh": "蜜蜂", "aliases": ["蜜蜂"] },
+    { "id": "eel-order", "nameZh": "鰻形目", "aliases": ["鰻形目", "鰻魚"], "group": "aquatic" },
+    { "id": "perciformes", "nameZh": "鱸形目", "aliases": ["鱸形目", "鱸魚", "石斑魚"], "group": "aquatic" },
+    { "id": "cypriniformes", "nameZh": "鯉形目", "aliases": ["鯉形目", "鯉魚", "草魚", "鯽魚"], "group": "aquatic" },
+    { "id": "siluriformes", "nameZh": "鯰形目", "aliases": ["鯰形目"], "group": "aquatic" },
+    { "id": "salmoniformes", "nameZh": "鮭形目", "aliases": ["鮭形目", "鮭魚", "鱒魚"], "group": "aquatic" },
+    { "id": "acipenseriformes", "nameZh": "鱘形目", "aliases": ["鱘形目"], "group": "aquatic" },
+    { "id": "gonorynchiformes", "nameZh": "鼠鱚目", "aliases": ["鼠鱚目", "鼠鱔目", "虱目魚"], "group": "aquatic" },
+    { "id": "testudines", "nameZh": "龜鱉目", "aliases": ["龜鱉目", "鱉"], "group": "aquatic" },
+    { "id": "aquatic-general", "nameZh": "水產動物", "aliases": ["水產", "水產動物", "觀賞魚", "魚類", "蝦類", "蝦", "貝類", "吳郭魚"], "group": "aquatic" }
+  ],
+  "generics": {
+    "家禽": ["chicken", "duck", "goose", "turkey"],
+    "家畜": ["pig", "cattle", "sheep", "horse"],
+    "反芻動物": ["cattle", "sheep"],
+    "反芻獸": ["cattle", "sheep"],
+    "水產": ["eel-order", "perciformes", "cypriniformes", "siluriformes", "salmoniformes", "acipenseriformes", "gonorynchiformes", "aquatic-general"],
+    "水產動物": ["eel-order", "perciformes", "cypriniformes", "siluriformes", "salmoniformes", "acipenseriformes", "gonorynchiformes", "aquatic-general"],
+    "魚類": ["aquatic-general"]
+  }
+}

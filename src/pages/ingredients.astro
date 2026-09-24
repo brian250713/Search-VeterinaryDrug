@@ -1,0 +1,89 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import Layout from '../layouts/Layout.astro';
+import type { Ingredient } from '../types/drug.js';
+import { ingredientUrl } from '../lib/url';
+
+const ingredientsPath = path.resolve('data/ingredients.json');
+const ingredients: Ingredient[] = fs.existsSync(ingredientsPath)
+  ? JSON.parse(fs.readFileSync(ingredientsPath, 'utf8'))
+  : [];
+
+// Sort by product count descending
+const topIngredients = ingredients.slice(0, 80);
+---
+
+<Layout title="標準化成分總覽 - 動物用藥品資訊查詢" description="依成分查詢動物用藥產品，包含阿莫西林、泰樂黴素、氟苯尼考等常用成分列表。">
+  <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <div>
+      <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem; color: #111827;">標準化成分總覽</h1>
+      <p style="color: #6b7280; font-size: 0.95rem;">
+        收錄一般動物用藥品中抽取的有效化學成分，共 {ingredients.length} 項標準成分。點選成分檢視該成分之單方與複方產品。
+      </p>
+    </div>
+
+    <!-- 搜尋成分過濾框 -->
+    <div class="card" style="padding: 1rem;">
+      <input
+        type="text"
+        id="ing-filter-input"
+        class="input-text"
+        placeholder="快速過濾成分名稱（英文或中文，如 Amoxicillin、泰樂黴素）..."
+      />
+    </div>
+
+    <!-- 成分清單卡片 -->
+    <div class="card">
+      <h2 style="font-size: 1.15rem; color: #047857; margin-bottom: 1rem;">最常用成分 (Top 80)</h2>
+      <div id="ing-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.75rem;">
+        {ingredients.map((ing) => (
+          <a
+            href={ingredientUrl(ing.slug)}
+            class="ing-item-card"
+            data-search={`${ing.name} ${ing.chineseName || ''}`.toLowerCase()}
+            style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; border: 1px solid var(--border); border-radius: 6px; text-decoration: none; color: inherit; background: #ffffff; transition: border-color 0.15s ease;"
+          >
+            <div>
+              <div style="font-weight: 600; color: #111827; font-size: 0.95rem;">{ing.name}</div>
+              {ing.chineseName && (
+                <div style="font-size: 0.85rem; color: #6b7280;">{ing.chineseName}</div>
+              )}
+            </div>
+            <div style="text-align: right;">
+              <span class="badge" style="background-color: #ecfdf5; color: #065f46;">
+                {ing.productCount} 項
+              </span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .ing-item-card:hover {
+      border-color: #047857 !important;
+      background-color: #f0fdf4 !important;
+    }
+  </style>
+
+  <script is:inline>
+    window.addEventListener('DOMContentLoaded', () => {
+      const input = document.getElementById('ing-filter-input');
+      const items = document.querySelectorAll('.ing-item-card');
+
+      input?.addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase().trim();
+        items.forEach((item) => {
+          const text = item.getAttribute('data-search') || '';
+          if (!q || text.includes(q)) {
+            item.style.display = 'flex';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
+</Layout>
