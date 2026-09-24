@@ -9,6 +9,7 @@ dist/
 data/raw.json
 data/products.json
 data/ingredients.json
+data/companies.json
 data/compare-data.json
 data/meta.json
 data/build-log.json

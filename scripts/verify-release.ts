@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Product, Ingredient } from '../src/types/drug.js';
+import type { Product, Ingredient, CompanySummary } from '../src/types/drug.js';
 import { shardOf, shardPath, DRUG_SHARDS, INGREDIENT_SHARDS, COMPANY_SHARDS } from '../src/lib/shard.js';
 import { normalizeCompanyName } from '../src/lib/company.js';
 
@@ -176,6 +176,38 @@ function main() {
       throw new Error(`驗證失敗: dist/data/compare-data.json 仍殘留存在`);
     }
     console.log('[verify] ✓ dist/data/compare-data.json 已移除');
+
+    // 公司總覽與成分總覽頁檢查
+    const distCompaniesIndex = path.join(distDir, 'companies', 'index.html');
+    if (!fs.existsSync(distCompaniesIndex)) {
+      throw new Error(`驗證失敗: 找不到 ${distCompaniesIndex}`);
+    }
+    const companiesHtml = fs.readFileSync(distCompaniesIndex, 'utf8');
+    const companyCardCount = (companiesHtml.match(/class="co-item-card"/g) || []).length;
+    const companiesPath = path.join(dataDir, 'companies.json');
+    if (!fs.existsSync(companiesPath)) {
+      throw new Error(`驗證失敗: 找不到 ${companiesPath}`);
+    }
+    const companies: CompanySummary[] = JSON.parse(fs.readFileSync(companiesPath, 'utf8'));
+    if (companyCardCount !== companies.length) {
+      throw new Error(
+        `驗證失敗: dist/companies/index.html 的公司項目數為 ${companyCardCount}，與 data/companies.json 的 ${companies.length} 筆不一致`
+      );
+    }
+    console.log(`[verify] ✓ dist/companies/index.html 存在，公司項目數 ${companyCardCount} 與 data/companies.json 一致`);
+
+    const distIngredientsIndex = path.join(distDir, 'ingredients', 'index.html');
+    if (!fs.existsSync(distIngredientsIndex)) {
+      throw new Error(`驗證失敗: 找不到 ${distIngredientsIndex}`);
+    }
+    const ingredientsHtml = fs.readFileSync(distIngredientsIndex, 'utf8');
+    const ingredientCardCount = (ingredientsHtml.match(/class="ing-item-card"/g) || []).length;
+    if (ingredientCardCount !== ingredients.length) {
+      throw new Error(
+        `驗證失敗: dist/ingredients/index.html 的成分項目數為 ${ingredientCardCount}，與 data/ingredients.json 的 ${ingredients.length} 筆不一致`
+      );
+    }
+    console.log(`[verify] ✓ dist/ingredients/index.html 成分項目數 ${ingredientCardCount} 與 data/ingredients.json 一致`);
   }
 
   console.log('[verify] 全部發布驗證通過！');

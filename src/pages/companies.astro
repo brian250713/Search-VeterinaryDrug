@@ -1,0 +1,242 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import Layout from '../layouts/Layout.astro';
+import type { CompanySummary } from '../types/drug.js';
+import { companyUrl } from '../lib/url';
+
+const companiesPath = path.resolve('data/companies.json');
+const companies: CompanySummary[] = fs.existsSync(companiesPath)
+  ? JSON.parse(fs.readFileSync(companiesPath, 'utf8'))
+  : [];
+
+const activeCount = companies.filter((c) => c.activeCount > 0).length;
+---
+
+<Layout title="公司總覽 - 動物用藥品資訊查詢" description="瀏覽所有動物用藥申請業者與製造廠，依公司名稱快速過濾、角色篩選與排序。">
+  <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <div>
+      <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem; color: #111827;">公司總覽</h1>
+      <p style="color: #6b7280; font-size: 0.95rem;">
+        列出所有擔任過申請業者或製造廠的公司，共 {companies.length} 家。預設只列出仍有未失效許可證的公司，點選公司檢視其產品。
+      </p>
+    </div>
+
+    <!-- 篩選區 -->
+    <div class="card" style="padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
+      <input
+        type="text"
+        id="co-filter-input"
+        class="input-text"
+        placeholder="快速過濾公司名稱（中英文，如 大豐、SWISS）..."
+      />
+      <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label for="co-filter-role" style="font-size: 0.85rem; font-weight: 600; color: #374151;">角色：</label>
+          <select id="co-filter-role" class="input-text" style="width: auto; padding: 0.35rem 0.6rem; font-size: 0.85rem;">
+            <option value="all">全部</option>
+            <option value="vendor">申請業者</option>
+            <option value="factory">製造廠</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label for="co-filter-sort" style="font-size: 0.85rem; font-weight: 600; color: #374151;">排序：</label>
+          <select id="co-filter-sort" class="input-text" style="width: auto; padding: 0.35rem 0.6rem; font-size: 0.85rem;">
+            <option value="product">產品數（多到少）</option>
+            <option value="active">未失效許可證數（多到少）</option>
+            <option value="name">名稱</option>
+          </select>
+        </div>
+
+        <label style="font-size: 0.85rem; display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+          <input type="checkbox" id="co-filter-inactive" />
+          <span>包含已無有效許可證的公司</span>
+        </label>
+
+        <span id="co-count" style="font-size: 0.85rem; color: #6b7280; margin-left: auto;">
+          顯示 {activeCount} / {companies.length} 家
+        </span>
+      </div>
+    </div>
+
+    <!-- 公司清單 -->
+    <div class="card">
+      <div id="co-grid" class="co-grid">
+        {companies.map((co) => (
+          <a
+            href={companyUrl(co.name)}
+            class="co-item-card"
+            data-name={co.name}
+            data-product-count={co.productCount}
+            data-active-count={co.activeCount}
+            data-vendor-count={co.vendorCount}
+            data-factory-count={co.factoryCount}
+            hidden={co.activeCount === 0}
+          >
+            <div class="co-item-name">{co.name}</div>
+            <div class="co-item-stats">
+              <span class="badge co-badge-product">{co.productCount} 項產品</span>
+              <span class="badge co-badge-active">未失效 {co.activeCount}</span>
+              {co.activeCount === 0 && (
+                <span class="badge co-badge-inactive">無有效許可證</span>
+              )}
+            </div>
+            <div class="co-item-roles">
+              申請業者 {co.vendorCount} 項・製造廠 {co.factoryCount} 項
+            </div>
+          </a>
+        ))}
+      </div>
+      <p id="co-inactive-hint" class="co-inactive-hint" style="display: none;"></p>
+      <p id="co-empty" class="co-empty" style="display: none;">沒有符合條件的公司</p>
+    </div>
+  </div>
+
+  <style>
+    .co-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 0.75rem;
+    }
+    .co-item-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      text-decoration: none;
+      color: inherit;
+      background: #ffffff;
+      transition: border-color 0.15s ease;
+    }
+    .co-item-card[hidden] {
+      display: none;
+    }
+    .co-item-card:hover {
+      border-color: #047857;
+      background-color: #f0fdf4;
+    }
+    .co-item-name {
+      font-weight: 600;
+      color: #111827;
+      font-size: 0.95rem;
+    }
+    .co-item-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+    .co-badge-product {
+      background-color: #ecfdf5;
+      color: #065f46;
+    }
+    .co-badge-active {
+      background-color: #e0e7ff;
+      color: #3730a3;
+    }
+    .co-badge-inactive {
+      background-color: #f3f4f6;
+      color: #6b7280;
+    }
+    .co-item-roles {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+    .co-inactive-hint {
+      font-size: 0.85rem;
+      color: #92400e;
+      background-color: #fffbeb;
+      border: 1px solid #fef3c7;
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      margin-top: 0.75rem;
+    }
+    .co-empty {
+      color: #6b7280;
+      font-size: 0.9rem;
+      padding: 1rem 0;
+      text-align: center;
+    }
+  </style>
+
+  <script>
+    import {
+      matchCompany,
+      compareCompanies,
+      type CompanyRoleFilter,
+      type CompanySortKey,
+      type CompanyFilterOptions,
+    } from '../lib/company';
+    import type { CompanySummary } from '../types/drug';
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const input = document.getElementById('co-filter-input') as HTMLInputElement | null;
+      const roleSelect = document.getElementById('co-filter-role') as HTMLSelectElement | null;
+      const sortSelect = document.getElementById('co-filter-sort') as HTMLSelectElement | null;
+      const inactiveCheckbox = document.getElementById('co-filter-inactive') as HTMLInputElement | null;
+      const grid = document.getElementById('co-grid');
+      const countEl = document.getElementById('co-count');
+      const emptyEl = document.getElementById('co-empty');
+      const inactiveHintEl = document.getElementById('co-inactive-hint');
+      if (!grid || !countEl || !emptyEl) return;
+
+      const cards = [...grid.querySelectorAll<HTMLAnchorElement>('.co-item-card')];
+      const total = cards.length;
+
+      function readSummary(card: HTMLAnchorElement): CompanySummary {
+        return {
+          name: card.dataset.name || '',
+          productCount: Number(card.dataset.productCount || 0),
+          activeCount: Number(card.dataset.activeCount || 0),
+          vendorCount: Number(card.dataset.vendorCount || 0),
+          factoryCount: Number(card.dataset.factoryCount || 0),
+        };
+      }
+
+      function applyFilters() {
+        const options: CompanyFilterOptions = {
+          query: input?.value || '',
+          role: (roleSelect?.value || 'all') as CompanyRoleFilter,
+          includeInactive: inactiveCheckbox?.checked || false,
+        };
+        const sortKey = (sortSelect?.value || 'product') as CompanySortKey;
+
+        // 有名稱條件時，另計因「無有效許可證」而未列出的符合公司
+        const countHiddenInactive = options.query.trim() !== '' && !options.includeInactive;
+        let hiddenInactive = 0;
+
+        const visible: { card: HTMLAnchorElement; summary: CompanySummary }[] = [];
+        for (const card of cards) {
+          const summary = readSummary(card);
+          if (matchCompany(summary, options)) {
+            card.hidden = false;
+            visible.push({ card, summary });
+          } else {
+            card.hidden = true;
+            if (countHiddenInactive && matchCompany(summary, { ...options, includeInactive: true })) {
+              hiddenInactive++;
+            }
+          }
+        }
+        visible.sort((x, y) => compareCompanies(x.summary, y.summary, sortKey));
+        for (const { card } of visible) {
+          grid?.appendChild(card);
+        }
+
+        countEl!.textContent = `顯示 ${visible.length} / ${total} 家`;
+        emptyEl!.style.display = visible.length === 0 ? 'block' : 'none';
+        if (inactiveHintEl) {
+          inactiveHintEl.style.display = hiddenInactive > 0 ? 'block' : 'none';
+          inactiveHintEl.textContent = `另有 ${hiddenInactive} 家已無有效許可證的公司符合，勾選「包含已無有效許可證的公司」即可顯示。`;
+        }
+      }
+
+      input?.addEventListener('input', applyFilters);
+      roleSelect?.addEventListener('change', applyFilters);
+      sortSelect?.addEventListener('change', applyFilters);
+      inactiveCheckbox?.addEventListener('change', applyFilters);
+    });
+  </script>
+</Layout>

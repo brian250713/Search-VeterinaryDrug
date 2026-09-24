@@ -10,8 +10,7 @@ const ingredients: Ingredient[] = fs.existsSync(ingredientsPath)
   ? JSON.parse(fs.readFileSync(ingredientsPath, 'utf8'))
   : [];
 
-// Sort by product count descending
-const topIngredients = ingredients.slice(0, 80);
+// data/ingredients.json 已依產品數由多到少排序
 ---
 
 <Layout title="標準化成分總覽 - 動物用藥品資訊查詢" description="依成分查詢動物用藥產品，包含阿莫西林、泰樂黴素、氟苯尼考等常用成分列表。">
@@ -35,55 +34,138 @@ const topIngredients = ingredients.slice(0, 80);
 
     <!-- 成分清單卡片 -->
     <div class="card">
-      <h2 style="font-size: 1.15rem; color: #047857; margin-bottom: 1rem;">最常用成分 (Top 80)</h2>
-      <div id="ing-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.75rem;">
-        {ingredients.map((ing) => (
-          <a
-            href={ingredientUrl(ing.slug)}
-            class="ing-item-card"
-            data-search={`${ing.name} ${ing.chineseName || ''}`.toLowerCase()}
-            style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; border: 1px solid var(--border); border-radius: 6px; text-decoration: none; color: inherit; background: #ffffff; transition: border-color 0.15s ease;"
-          >
-            <div>
-              <div style="font-weight: 600; color: #111827; font-size: 0.95rem;">{ing.name}</div>
-              {ing.chineseName && (
-                <div style="font-size: 0.85rem; color: #6b7280;">{ing.chineseName}</div>
-              )}
-            </div>
-            <div style="text-align: right;">
-              <span class="badge" style="background-color: #ecfdf5; color: #065f46;">
-                {ing.productCount} 項
-              </span>
-            </div>
-          </a>
-        ))}
+      <h2 id="ing-heading" style="font-size: 1.15rem; color: #047857; margin-bottom: 1rem;">最常用成分 (Top 80)</h2>
+      <p id="ing-count" style="display: none;"></p>
+      <div id="ing-grid">{ingredients.map((ing, idx) => <a href={ingredientUrl(ing.slug)} class="ing-item-card" hidden={idx >= 80}><span><span>{ing.name}</span>{ing.chineseName && <span>{ing.chineseName}</span>}</span><span>{ing.productCount} 項</span></a>)}</div>
+      <p id="ing-empty" style="display: none;">沒有符合條件的成分</p>
+      <div style="margin-top: 1rem; text-align: center;">
+        <button id="ing-expand-btn" class="btn btn-secondary">
+          顯示全部 {ingredients.length.toLocaleString('en-US')} 項成分
+        </button>
       </div>
     </div>
   </div>
 
-  <style>
-    .ing-item-card:hover {
-      border-color: #047857 !important;
-      background-color: #f0fdf4 !important;
+  <!-- 全域樣式（is:global）：避免 Astro 幫 2,694 張卡片逐一加上 scoped 屬性，縮小 HTML -->
+  <style is:global>
+    #ing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 0.75rem;
+    }
+    #ing-count {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-bottom: 0.75rem;
+    }
+    #ing-grid > a.ing-item-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      text-decoration: none;
+      color: inherit;
+      background: #ffffff;
+      transition: border-color 0.15s ease;
+    }
+    #ing-grid > a.ing-item-card[hidden] {
+      display: none;
+    }
+    #ing-grid > a.ing-item-card:hover {
+      border-color: #047857;
+      background-color: #f0fdf4;
+    }
+    #ing-grid > a.ing-item-card > span:first-child {
+      display: flex;
+      flex-direction: column;
+      font-weight: 600;
+      color: #111827;
+      font-size: 0.95rem;
+    }
+    #ing-grid > a.ing-item-card > span:first-child > span + span {
+      font-weight: 400;
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+    #ing-grid > a.ing-item-card > span:last-child {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.15rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      line-height: 1.25;
+      background-color: #ecfdf5;
+      color: #065f46;
+      white-space: nowrap;
+    }
+    #ing-empty {
+      color: #6b7280;
+      font-size: 0.9rem;
+      padding: 1rem 0;
+      text-align: center;
     }
   </style>
 
-  <script is:inline>
-    window.addEventListener('DOMContentLoaded', () => {
-      const input = document.getElementById('ing-filter-input');
-      const items = document.querySelectorAll('.ing-item-card');
+  <script>
+    import { matchOverviewName, normalizeFilterText } from '../lib/overview-filter';
 
-      input?.addEventListener('input', (e) => {
-        const q = e.target.value.toLowerCase().trim();
-        items.forEach((item) => {
-          const text = item.getAttribute('data-search') || '';
-          if (!q || text.includes(q)) {
-            item.style.display = 'flex';
+    window.addEventListener('DOMContentLoaded', () => {
+      const input = document.getElementById('ing-filter-input') as HTMLInputElement | null;
+      const grid = document.getElementById('ing-grid');
+      const items = [...(grid?.querySelectorAll<HTMLAnchorElement>('.ing-item-card') || [])];
+      const expandBtn = document.getElementById('ing-expand-btn') as HTMLButtonElement | null;
+      const countEl = document.getElementById('ing-count');
+      const emptyEl = document.getElementById('ing-empty');
+      const headingEl = document.getElementById('ing-heading');
+      let expanded = false;
+
+      function applyFilter() {
+        const q = input?.value || '';
+        const filtering = normalizeFilterText(q) !== '';
+
+        let shown = 0;
+        items.forEach((item, idx) => {
+          // 只比對名稱欄（第一個 span），不含右側產品數
+          const text = item.firstElementChild?.textContent || '';
+          if (!filtering) {
+            item.hidden = !expanded && idx >= 80;
           } else {
-            item.style.display = 'none';
+            item.hidden = !matchOverviewName(text, q);
           }
+          if (!item.hidden) shown++;
         });
+
+        if (headingEl) {
+          headingEl.textContent = filtering
+            ? '過濾結果'
+            : expanded
+              ? `全部成分 (${items.length.toLocaleString('en-US')} 項，依產品數排序)`
+              : '最常用成分 (Top 80)';
+        }
+
+        if (countEl) {
+          if (filtering) {
+            countEl.style.display = 'block';
+            countEl.textContent = `符合 ${shown} 項成分`;
+          } else {
+            countEl.style.display = 'none';
+          }
+        }
+        if (emptyEl) {
+          emptyEl.style.display = shown === 0 ? 'block' : 'none';
+        }
+      }
+
+      expandBtn?.addEventListener('click', () => {
+        expanded = true;
+        if (expandBtn) expandBtn.style.display = 'none';
+        applyFilter();
       });
+
+      input?.addEventListener('input', applyFilter);
     });
   </script>
 </Layout>

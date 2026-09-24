@@ -8,6 +8,7 @@ import type {
   CompanyProductSummary,
   CompanyDetailShard,
   CompanyRole,
+  CompanySummary,
   ProductShard,
   IngredientDetailShard,
 } from '../src/types/drug.js';
@@ -235,6 +236,27 @@ export function buildShards() {
     if (size > maxCompanyShardBytes) maxCompanyShardBytes = size;
   }
 
+  // 4. 輸出公司摘要清單 data/companies.json（與公司分片同一次彙整，供公司總覽頁建置時靜態渲染）
+  const companies: CompanySummary[] = [...companyMap.values()].map((acc) => {
+    let activeCount = 0;
+    for (const summary of acc.products.values()) {
+      if (summary.status !== 'expired') activeCount++;
+    }
+    return {
+      name: acc.name,
+      productCount: acc.products.size,
+      activeCount,
+      vendorCount: acc.vendorCount,
+      factoryCount: acc.factoryCount,
+    };
+  });
+  companies.sort((a, b) => b.productCount - a.productCount || a.name.localeCompare(b.name, 'zh-Hant'));
+  fs.writeFileSync(
+    path.join(projectRoot, 'data', 'companies.json'),
+    JSON.stringify(companies, null, 2),
+    'utf8'
+  );
+
   const logPath = path.join(projectRoot, 'data', 'build-log.json');
   if (fs.existsSync(logPath)) {
     try {
@@ -268,6 +290,7 @@ export function buildShards() {
   console.log(
     `  - 公司分片: ${COMPANY_SHARDS} 片，公司數 ${companyMap.size}，總大小 ${(totalCompanyShardBytes / 1024 / 1024).toFixed(2)} MB (平均每片 ${(totalCompanyShardBytes / COMPANY_SHARDS / 1024).toFixed(1)} KB，最大單片 ${(maxCompanyShardBytes / 1024).toFixed(1)} KB)`
   );
+  console.log(`  - 公司摘要: data/companies.json，共 ${companies.length} 家公司`);
 }
 
 // 若直接執行則跑 buildShards()

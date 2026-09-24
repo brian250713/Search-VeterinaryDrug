@@ -158,6 +158,14 @@ export interface CompanyDetailShard {
   };
 }
 
+export interface CompanySummary {
+  name: string;
+  productCount: number;
+  activeCount: number;
+  vendorCount: number;
+  factoryCount: number;
+}
+
 export interface IngredientDetailShard {
   [slug: string]: {
     ingredient: Ingredient;
