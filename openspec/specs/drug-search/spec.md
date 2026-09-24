@@ -1,7 +1,8 @@
 # drug-search Specification
 
 ## Purpose
-TBD - created by archiving change add-vet-drug-search-site. Update Purpose after archive.
+規範瀏覽器端的動物用藥品搜尋體驗：中英文全文搜尋、搜尋索引延遲載入、多面向篩選與可分享網址、預設排除規則，以及蛋雞／蛋鴨使用限制的預設處理方式。
+
 ## Requirements
 ### Requirement: 全文搜尋
 系統 SHALL 在瀏覽器端提供全文搜尋，可搜尋中文品名、英文品名、標準成分（英文與中文名）、許可證字號、業者名稱與適應症。中文 MUST 支援不含空格的部分字詞查詢。搜尋結果依相關度排序，中文品名命中的權重最高。

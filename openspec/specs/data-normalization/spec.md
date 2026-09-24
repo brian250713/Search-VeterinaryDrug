@@ -1,7 +1,8 @@
 # data-normalization Specification
 
 ## Purpose
-TBD - created by archiving change add-vet-drug-search-site. Update Purpose after archive.
+規範把 API 原始欄位轉成網站可用的標準化產品資料：產品 slug、文字與民國日期清理、許可證狀態判定、產品分類與劑型分層、成分抽取與標準化、物種與使用限制抽取，以及供維護用的建置日誌。
+
 ## Requirements
 ### Requirement: 產品識別碼
 系統 SHALL 從許可證字號產生穩定的 slug：「製字」對應 `m`，「入字」對應 `i`，後接字號中的號碼（保留英文字母），例如「動物藥製字第09469號」→ `m-09469`、「動物藥製字第F0106號」→ `m-f0106`。許可證字號空白或無法解析的資料列 MUST 略過並記入建置日誌；字號重複時保留最後一筆並記入日誌。

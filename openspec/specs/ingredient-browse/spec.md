@@ -1,14 +1,28 @@
 # ingredient-browse Specification
 
 ## Purpose
-TBD - created by archiving change add-vet-drug-search-site. Update Purpose after archive.
+規範以標準成分為入口的瀏覽體驗：成分頁列出含該成分的所有一般藥品，依單方／複方與劑型分組並提供物種、劑型、產地篩選，讓使用者從成分快速找到可用的動物用藥品並加入比較。
+
 ## Requirements
+
 ### Requirement: 成分頁
-系統 SHALL 為每個出現在一般藥品中的標準成分產生靜態頁面，網址為 `/ingredient/<成分 slug>`（標準英文名稱轉小寫、空白換成連字號）。頁面標題顯示英文標準名與中文名（有的話）以及產品數。
+系統 SHALL 提供單一成分頁，網址為 `/ingredient/?slug=<成分 slug>`（標準英文名稱轉小寫，非英數字元換成連字號）。每個出現在一般藥品中的標準成分都 MUST 能以此網址開啟。頁面由瀏覽器端依 `slug` 參數讀取資料後渲染。直接開啟此網址時，回應狀態 MUST 為 200。頁面標題顯示英文標準名、中文名（有的話）與產品數，並同步設定為瀏覽器頁面標題。
 
 #### Scenario: 產生成分頁
 - **WHEN** 標準化結果中有 157 項產品含 FLORFENICOL
-- **THEN** 網站有 `/ingredient/florfenicol` 頁面，標題顯示 FLORFENICOL 與其中文名，以及產品數
+- **THEN** 建置只產出單一成分殼頁 `dist/ingredient/index.html`（不再為每個成分個別產生靜態頁），使用者開啟 `/ingredient/?slug=florfenicol` 時，瀏覽器以 FNV-1a 雜湊算出分片編號、讀取 `/data/ingredient/NNN.json` 中 slug 為 `florfenicol` 的條目後渲染成分頁
+
+#### Scenario: 開啟成分頁
+- **WHEN** 標準化結果中有 157 項產品含 FLORFENICOL，使用者開啟 `/ingredient/?slug=florfenicol`
+- **THEN** 頁面標題顯示 FLORFENICOL、其中文名與產品數
+
+#### Scenario: 查無成分
+- **WHEN** 使用者開啟 `/ingredient/?slug=not-an-ingredient`
+- **THEN** 頁面顯示「找不到此成分」與前往成分總覽的連結
+
+#### Scenario: 載入失敗
+- **WHEN** 讀取成分資料時發生網路錯誤
+- **THEN** 頁面顯示「資料載入失敗」與重新載入按鈕
 
 ### Requirement: 分組呈現
 成分頁 SHALL 先把產品分為「單方」與「複方」兩組，單方排在前面；每組內再依劑型大類分組。每個產品項目 MUST 顯示適用物種與限制標記。複方組 MUST 顯示說明：複方產品含其他成分，不能直接視為替代品。
@@ -40,11 +54,11 @@ TBD - created by archiving change add-vet-drug-search-site. Update Purpose after
 - **THEN** 頁面頂端顯示自動歸類提示
 
 ### Requirement: 從產品與搜尋連到成分頁
-產品詳情頁、搜尋結果與比較頁中的每個標準成分 SHALL 連結到對應的成分頁。
+產品詳情頁、搜尋結果、比較頁與成分總覽中的每個標準成分 SHALL 連結到對應的成分頁 `/ingredient/?slug=<成分 slug>`。
 
 #### Scenario: 點選成分
 - **WHEN** 使用者在產品詳情頁點選成分 FLORFENICOL
-- **THEN** 進入 `/ingredient/florfenicol`
+- **THEN** 進入 `/ingredient/?slug=florfenicol`
 
 ### Requirement: 從成分頁加入比較
 成分頁的每個產品項目 SHALL 提供加入比較的勾選框，行為與搜尋頁一致。
@@ -53,3 +67,13 @@ TBD - created by archiving change add-vet-drug-search-site. Update Purpose after
 - **WHEN** 使用者在成分頁勾選兩個產品
 - **THEN** 浮動列顯示「比較已選 (2)」
 
+### Requirement: 成分 slug 唯一
+每個成分 slug SHALL 只對應一個成分。多個成分名稱產生相同 slug 時，系統 MUST 把它們合併為同一個成分：產品數最多的名稱作為標準名稱，其他名稱列為別名，產品數以不重複的產品計算。
+
+#### Scenario: 名稱變體合併
+- **WHEN** 成分名稱「TYLOSIN」與「TYLOSIN ，按乾燥品計算，每」都產生 slug `tylosin`
+- **THEN** 只有一個 slug 為 `tylosin` 的成分，標準名稱為產品數較多的名稱，另一個名稱列為別名；開啟 `/ingredient/?slug=tylosin` 時，列出含任一名稱的產品
+
+#### Scenario: 同一產品不重複計算
+- **WHEN** 同一產品的成分同時出現兩個會合併的名稱
+- **THEN** 該成分的產品數只計算這個產品一次

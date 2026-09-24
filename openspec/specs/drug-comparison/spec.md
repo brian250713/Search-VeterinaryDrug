@@ -1,8 +1,10 @@
 # drug-comparison Specification
 
 ## Purpose
-TBD - created by archiving change add-vet-drug-search-site. Update Purpose after archive.
+規範最多 3 項動物用藥品的並排比較體驗：跨頁保留的比較清單、可分享的比較網址、以列為屬性欄為產品的比較表與物種矩陣差異標示，以及在行動裝置上可用的版面。
+
 ## Requirements
+
 ### Requirement: 比較清單
 系統 SHALL 讓使用者從搜尋結果、成分頁與產品詳情頁把產品加入比較清單，最多 3 項。清單有項目時，頁面 MUST 顯示浮動列「比較已選 (n)」與前往比較頁的按鈕。清單保存在瀏覽器儲存空間中；儲存空間無法使用時功能仍可在單一頁面內運作。
 
@@ -34,7 +36,7 @@ TBD - created by archiving change add-vet-drug-search-site. Update Purpose after
 - **THEN** 只顯示 m-09469，並提示有 1 項產品找不到
 
 ### Requirement: 比較表內容
-比較頁 SHALL 以列為屬性、欄為產品呈現：中文品名（連到詳情頁）、劑型、標準成分（單方／複方標記，連到成分頁）、成分原文、國產／輸入、業者、狀態與到期日、包裝。所有產品值相同的列 MUST 以視覺方式標示為「相同」，不同的列標示為「有差異」。
+比較頁 SHALL 以列為屬性、欄為產品呈現：中文品名（連到詳情頁 `/drug/?id=<slug>`）、劑型、標準成分（單方／複方標記，連到成分頁 `/ingredient/?slug=<成分 slug>`）、成分原文、國產／輸入、業者、狀態與到期日、包裝。所有產品值相同的列 MUST 以視覺方式標示為「相同」，不同的列標示為「有差異」。所有資料欄位 MUST 以純文字呈現，不得被瀏覽器解讀為標籤或指令碼。
 
 #### Scenario: 相同成分標示
 - **WHEN** 比較的 2 項產品標準成分都只有 FLORFENICOL
@@ -43,6 +45,10 @@ TBD - created by archiving change add-vet-drug-search-site. Update Purpose after
 #### Scenario: 複方標示
 - **WHEN** 比較中有一項產品為複方
 - **THEN** 該產品的成分儲存格明確標示「複方」並列出所有成分
+
+#### Scenario: 品名連到詳情頁
+- **WHEN** 使用者在比較頁點選產品 m-09469 的中文品名
+- **THEN** 進入 `/drug/?id=m-09469`
 
 ### Requirement: 物種矩陣
 比較頁 SHALL 顯示物種矩陣：列為所選產品涉及的所有標準物種，儲存格為「適用」、「不適用」或「適用但有限制」（附限制文字）。泛稱展開的物種標示「泛稱」。每個適用的儲存格 MUST 可以展開查看該物種的適應症原文。
@@ -73,3 +79,9 @@ TBD - created by archiving change add-vet-drug-search-site. Update Purpose after
 - **WHEN** 使用者開啟 `/compare` 且沒有 ids 參數，比較清單也是空的
 - **THEN** 顯示如何加入產品的說明與搜尋連結
 
+### Requirement: 比較頁只載入所需資料
+比較頁 SHALL 只下載所選產品所需的資料，MUST NOT 下載全部產品的資料。
+
+#### Scenario: 比較 2 項產品
+- **WHEN** 使用者開啟 `/compare?ids=m-09469,i-07606`
+- **THEN** 瀏覽器只下載這 2 項產品所在的資料分片，不下載包含全部產品的資料檔

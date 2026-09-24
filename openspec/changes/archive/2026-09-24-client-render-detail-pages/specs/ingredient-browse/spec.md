@@ -3,6 +3,10 @@
 ### Requirement: 成分頁
 系統 SHALL 提供單一成分頁，網址為 `/ingredient/?slug=<成分 slug>`（標準英文名稱轉小寫，非英數字元換成連字號）。每個出現在一般藥品中的標準成分都 MUST 能以此網址開啟。頁面由瀏覽器端依 `slug` 參數讀取資料後渲染。直接開啟此網址時，回應狀態 MUST 為 200。頁面標題顯示英文標準名、中文名（有的話）與產品數，並同步設定為瀏覽器頁面標題。
 
+#### Scenario: 產生成分頁
+- **WHEN** 標準化結果中有 157 項產品含 FLORFENICOL
+- **THEN** 建置只產出單一成分殼頁 `dist/ingredient/index.html`（不再為每個成分個別產生靜態頁），使用者開啟 `/ingredient/?slug=florfenicol` 時，瀏覽器以 FNV-1a 雜湊算出分片編號、讀取 `/data/ingredient/NNN.json` 中 slug 為 `florfenicol` 的條目後渲染成分頁
+
 #### Scenario: 開啟成分頁
 - **WHEN** 標準化結果中有 157 項產品含 FLORFENICOL，使用者開啟 `/ingredient/?slug=florfenicol`
 - **THEN** 頁面標題顯示 FLORFENICOL、其中文名與產品數

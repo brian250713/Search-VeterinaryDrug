@@ -1,7 +1,8 @@
 # data-ingestion Specification
 
 ## Purpose
-TBD - created by archiving change add-vet-drug-search-site. Update Purpose after archive.
+規範從農業部動植物防疫檢疫署「動物用藥資訊」API 完整抓取原始資料的流程，包含分頁抓取、失敗重試、筆數防呆與來源欄位驗證，並保證每週排程任一步驟失敗時不部署、線上版本維持不變。
+
 ## Requirements
 ### Requirement: 分頁抓取完整資料
 系統 SHALL 以 `$top` 與 `$skip` 參數分頁呼叫 MOA 動物用藥資訊 API，持續抓取直到回傳空陣列，並把所有頁面合併為一份原始資料。系統 MUST NOT 依賴不帶分頁參數的單次呼叫。

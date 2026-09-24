@@ -1,7 +1,8 @@
 # data-attribution Specification
 
 ## Purpose
-TBD - created by archiving change add-vet-drug-search-site. Update Purpose after archive.
+規範全站對使用者的資料揭露義務：每個頁面的免責聲明、資料來源與授權標示，以及本版資料的擷取日期與筆數。讓使用者清楚本站內容整理自政府開放資料、僅供查詢參考、不構成用藥建議。
+
 ## Requirements
 ### Requirement: 免責聲明
 每個頁面 SHALL 顯示免責聲明，說明本站內容整理自政府開放資料、僅供查詢參考、不構成用藥建議，用藥應遵從獸醫師指示並以主管機關公告為準。比較頁 MUST 在比較表上方再次顯示簡短版本。
