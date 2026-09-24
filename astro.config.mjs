@@ -2,6 +2,6 @@ import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   output: 'static',
-  site: 'https://example.github.io/Search-VeterinaryDrug',
+  site: 'https://brian250713.github.io/Search-VeterinaryDrug',
   base: '/Search-VeterinaryDrug'
 });
