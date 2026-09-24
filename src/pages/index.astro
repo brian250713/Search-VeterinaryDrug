@@ -184,6 +184,7 @@ import metaData from '../../data/meta.json';
   <script>
     import { escapeHtml } from '../lib/escape-html';
     import { drugUrl, ingredientUrl, dataUrl } from '../lib/url';
+    import { renderCompanyLink } from '../lib/product-list';
 
     const appEl = document.getElementById('search-app');
     const dataVersion = appEl?.getAttribute('data-version') || undefined;
@@ -519,7 +520,7 @@ import metaData from '../../data/meta.json';
           const slug = ing.slug || ing.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
           const ingZh = ing.chineseName ? ` (${escapeHtml(ing.chineseName)})` : '';
           return `<a href="${ingredientUrl(slug)}" style="font-weight:600; margin-right:0.4rem;">${escapeHtml(ing.name)}${ingZh}</a>`;
-        }).join('');
+        }).join(' ');
 
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;">
@@ -542,7 +543,7 @@ import metaData from '../../data/meta.json';
 
           <div style="font-size:0.85rem; color:#374151; display:flex; flex-wrap:wrap; gap:1rem;">
             <span>劑型：<strong>${escapeHtml(p.dosageFormCategory)}</strong></span>
-            <span>業者：<strong>${escapeHtml(p.vendorName || '未載明')}</strong></span>
+            <span>業者：<strong>${renderCompanyLink(p.vendorName)}</strong></span>
             <span>效期：${escapeHtml(p.expiryDate || '未載明')}</span>
           </div>
 

@@ -103,4 +103,44 @@ describe('renderProduct (task 4.6 & product-detail spec)', () => {
     expect(html).toContain('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;');
     expect(html).toContain('&quot;藥劑&quot;');
   });
+
+  it('links vendor and factory names to company pages (task 5.1)', () => {
+    const prod = createBaseProduct({
+      vendorName: '大豐化學製藥股份有限公司',
+      factoryName: '大豐化學製藥股份有限公司',
+    });
+
+    const html = renderProduct(prod);
+    const expected = `/Search-VeterinaryDrug/company/?name=${encodeURIComponent('大豐化學製藥股份有限公司')}`;
+    expect(html).toContain(`<a href="${expected}">大豐化學製藥股份有限公司</a>`);
+  });
+
+  it('shows 未載明 without link for blank vendor/factory names (task 5.1)', () => {
+    const prod = createBaseProduct({
+      vendorName: '測試藥廠',
+      factoryName: '   ',
+    });
+
+    const html = renderProduct(prod);
+    expect(html).toContain('製造廠</th>');
+    expect(html).toContain('<strong>未載明</strong>');
+    // 只有非空白的業者有公司連結，空白製造廠沒有
+    const links = html.match(/\/Search-VeterinaryDrug\/company\/\?name=/g) || [];
+    expect(links.length).toBe(1);
+  });
+
+  it('encodes special characters in company links', () => {
+    const prod = createBaseProduct({
+      vendorName: 'A & B "公司"',
+      factoryName: 'C<D>公司',
+    });
+
+    const html = renderProduct(prod);
+    expect(html).toContain(
+      `/Search-VeterinaryDrug/company/?name=${encodeURIComponent('A & B "公司"')}`
+    );
+    expect(html).toContain('A &amp; B &quot;公司&quot;');
+    expect(html).toContain('C&lt;D&gt;公司');
+    expect(html).not.toContain('A & B "公司"</a>');
+  });
 });

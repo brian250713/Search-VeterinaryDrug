@@ -9,6 +9,7 @@
 - **搜尋**：中英文品名、成分、許可證字號全文搜尋，可依物種、劑型、國產／輸入等條件篩選，篩選結果可用網址分享。
 - **產品詳情**：`/drug/?id=<slug>`，顯示品名、效期與狀態、標準成分與成分原文、適用物種與使用限制。
 - **成分瀏覽**：`/ingredient/?slug=<slug>`，列出含該成分的藥品，依單方／複方與劑型分組。
+- **公司瀏覽**：`/company/?name=<公司名稱>`，列出該公司擔任申請業者或製造廠的所有產品，可篩選角色（全部／申請業者／製造廠）與類別（一般藥品、生物製劑、原料藥）。
 - **並排比較**：最多 3 項產品並排比較成分、劑型、物種與使用限制，比較網址可分享。
 
 失效許可證與生物製劑預設不顯示；蛋雞／蛋鴨有使用限制的產品會特別標示。本站不含停藥期與用法用量。
@@ -17,14 +18,15 @@
 
 - [Astro](https://astro.build/) 靜態網站，部署在 GitHub Pages（base path `/Search-VeterinaryDrug`）。
 - 搜尋使用 [MiniSearch](https://github.com/lucaong/minisearch)，在瀏覽器端執行，索引延遲載入。
-- 詳情頁與成分頁是單一殼頁，瀏覽器依 slug 以 FNV-1a 雜湊算出分片，只下載需要的 JSON 分片（產品 128 片、成分 64 片）。
+- 詳情頁、成分頁與公司頁是單一殼頁，瀏覽器依 slug 或公司名稱以 FNV-1a 雜湊算出分片，只下載需要的 JSON 分片（產品 128 片、成分 64 片、公司 64 片）。
+- 產品詳情、比較表、搜尋結果與成分／公司頁卡片中的申請業者與製造廠名稱會連到對應的公司頁。
 
 ### 資料流程
 
 ```
 MOA API ──fetch──▶ data/raw.json ──normalize──▶ data/products.json、ingredients.json
                                               ├─▶ public/data/search-index.json
-                                              └─▶ public/data/drug/NNN.json、ingredient/NNN.json
+                                              └─▶ public/data/drug/NNN.json、ingredient/NNN.json、company/NNN.json
 ```
 
 | 指令 | 說明 |
@@ -54,7 +56,7 @@ pnpm dev
 ```
 scripts/        資料抓取、標準化、分片與發布驗證腳本
 src/lib/        共用模組（標準化、分片、搜尋斷詞、HTML 跳脫、網址）
-src/pages/      頁面（首頁搜尋、詳情、成分、成分總覽、比較、關於資料）
+src/pages/      頁面（首頁搜尋、詳情、成分、成分總覽、公司、比較、關於資料）
 data/           人工維護的對照表（同義詞、物種、劑型）與筆數基準
 public/data/    產生的搜尋索引與資料分片
 tests/          單元測試

@@ -1,5 +1,7 @@
 const DEFAULT_BASE = '/Search-VeterinaryDrug';
 
+import { normalizeCompanyName } from './company.js';
+
 /**
  * 取得當前應用程式的 base path (不含結尾斜線)
  */
@@ -41,6 +43,14 @@ export function drugUrl(slug: string): string {
  */
 export function ingredientUrl(slug: string): string {
   return `${withBase('ingredient/')}?slug=${encodeURIComponent(slug)}`;
+}
+
+/**
+ * 公司頁連結（名稱先經 normalizeCompanyName 正規化再編碼）
+ * @example companyUrl('大豐化學製藥股份有限公司') -> '/Search-VeterinaryDrug/company/?name=...'
+ */
+export function companyUrl(name: string): string {
+  return `${withBase('company/')}?name=${encodeURIComponent(normalizeCompanyName(name))}`;
 }
 
 /**

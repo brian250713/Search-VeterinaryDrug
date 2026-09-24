@@ -174,23 +174,15 @@ const dataVersion = metaData.fetchedAt;
 
   <script>
     import { shardOf, shardPath, INGREDIENT_SHARDS } from '../../lib/shard';
-    import { dataUrl, drugUrl, ingredientUrl } from '../../lib/url';
+    import { dataUrl } from '../../lib/url';
     import { escapeHtml } from '../../lib/escape-html';
+    import {
+      filterProducts,
+      groupProducts,
+      renderProductCard,
+      type DosageGroup,
+    } from '../../lib/product-list';
     import type { Ingredient, ProductSummary } from '../../types/drug';
-
-    const AQUATIC_SPECIES = new Set([
-      'eel-order', 'perciformes', 'cypriniformes', 'siluriformes',
-      'salmoniformes', 'acipenseriformes', 'gonorynchiformes', 'testudines', 'aquatic-general'
-    ]);
-
-    const SPECIES_NAMES_ZH: Record<string, string> = {
-      pig: '豬', chicken: '雞', duck: '鴨', goose: '鵝', turkey: '火雞',
-      cattle: '牛', sheep: '羊', horse: '馬', dog: '犬', cat: '貓',
-      rabbit: '兔', pigeon: '鴿', bee: '蜜蜂', 'eel-order': '鰻形目',
-      perciformes: '鱸形目', cypriniformes: '鯉形目', siluriformes: '鯰形目',
-      salmoniformes: '鮭形目', acipenseriformes: '鱘形目', gonorynchiformes: '鼠鱚目',
-      testudines: '龜鱉目', 'aquatic-general': '水產動物'
-    };
 
     const appEl = document.getElementById('ingredient-app');
     const dataVersion = appEl?.getAttribute('data-version') || undefined;
@@ -299,42 +291,16 @@ const dataVersion = metaData.fetchedAt;
       const origin = (document.getElementById('ing-filter-origin') as HTMLSelectElement)?.value || 'all';
       const incExpired = (document.getElementById('ing-filter-expired') as HTMLInputElement)?.checked || false;
 
-      let layingExcluded = 0;
-
-      const filtered = initialProducts.filter((p) => {
-        if (!incExpired && p.status === 'expired') return false;
-        if (origin !== 'all' && p.origin !== origin) return false;
-        if (dosage && p.dosageFormCategory !== dosage) return false;
-
-        if (sp) {
-          const indications = p.speciesIndications || [];
-          if (sp === 'aquatic') {
-            if (!indications.some((i) => AQUATIC_SPECIES.has(i.species))) return false;
-          } else if (sp === 'laying-hen') {
-            const chicken = indications.find((i) => i.species === 'chicken');
-            if (!chicken) return false;
-            if (chicken.restrictions && chicken.restrictions.includes('not-laying-hens')) {
-              if (!expandLaying) {
-                layingExcluded++;
-                return false;
-              }
-            }
-          } else if (sp === 'laying-duck') {
-            const duck = indications.find((i) => i.species === 'duck');
-            if (!duck) return false;
-            if (duck.restrictions && duck.restrictions.includes('not-laying-ducks')) {
-              if (!expandLaying) {
-                layingExcluded++;
-                return false;
-              }
-            }
-          } else {
-            if (!indications.some((i) => i.species === sp)) return false;
-          }
+      const { items: filtered, excludedLayingCount: layingExcluded } = filterProducts(
+        initialProducts,
+        {
+          species: sp,
+          dosageCategory: dosage,
+          origin: origin as 'all' | '國產' | '輸入',
+          includeExpired: incExpired,
+          expandLaying,
         }
-
-        return true;
-      });
+      );
 
       const layingAlert = document.getElementById('ing-laying-alert');
       const layingCount = document.getElementById('ing-laying-count');
@@ -347,39 +313,34 @@ const dataVersion = metaData.fetchedAt;
         }
       }
 
-      const singleList = filtered.filter((p) => p.isSingleIngredient);
-      const compoundList = filtered.filter((p) => !p.isSingleIngredient);
+      const grouped = groupProducts(filtered);
 
-      renderSubgroup('container-single', singleList);
-      renderSubgroup('container-compound', compoundList);
+      renderSubgroup('container-single', grouped.single);
+      renderSubgroup('container-compound', grouped.compound);
 
+      const singleCount = grouped.single.reduce((n, g) => n + g.products.length, 0);
+      const compoundCount = grouped.compound.reduce((n, g) => n + g.products.length, 0);
       const secSingle = document.getElementById('section-single');
       const secCompound = document.getElementById('section-compound');
-      if (secSingle) secSingle.style.display = singleList.length > 0 ? 'block' : 'none';
-      if (secCompound) secCompound.style.display = compoundList.length > 0 ? 'block' : 'none';
+      if (secSingle) secSingle.style.display = singleCount > 0 ? 'block' : 'none';
+      if (secCompound) secCompound.style.display = compoundCount > 0 ? 'block' : 'none';
     }
 
-    function renderSubgroup(containerId: string, items: ProductSummary[]) {
+    function renderSubgroup(containerId: string, groups: DosageGroup<ProductSummary>[]) {
       const container = document.getElementById(containerId);
       if (!container) return;
       container.innerHTML = '';
 
-      if (items.length === 0) {
+      const total = groups.reduce((n, g) => n + g.products.length, 0);
+      if (total === 0) {
         container.innerHTML = '<p style="color:#6b7280; font-size:0.9rem; padding:0.5rem 0;">無符合篩選條件的產品。</p>';
         return;
       }
 
-      const byDosage = new Map<string, ProductSummary[]>();
-      for (const p of items) {
-        const cat = p.dosageFormCategory || '其他劑型';
-        const list = byDosage.get(cat) || [];
-        list.push(p);
-        byDosage.set(cat, list);
-      }
-
       const compareList = getCompareList();
+      const currentSlug = currentIngredient?.slug || '';
 
-      for (const [catName, prods] of byDosage.entries()) {
+      for (const { category: catName, products: prods } of groups) {
         const groupEl = document.createElement('div');
         groupEl.style.display = 'flex';
         groupEl.style.flexDirection = 'column';
@@ -405,63 +366,11 @@ const dataVersion = metaData.fetchedAt;
           card.style.flexDirection = 'column';
           card.style.gap = '0.5rem';
 
-          let statusTag = '';
-          if (p.status === 'active') statusTag = '<span class="badge badge-active">有效</span>';
-          else if (p.status === 'expired') statusTag = '<span class="badge badge-expired">已失效</span>';
-          else statusTag = '<span class="badge badge-unknown">效期未載明</span>';
-
-          const speciesTags = (p.speciesIndications || [])
-            .map((sp) => {
-              const name = escapeHtml(SPECIES_NAMES_ZH[sp.species] || sp.species);
-              let restr = '';
-              if (sp.restrictions && sp.restrictions.includes('not-laying-hens')) {
-                restr = ' <span style="color:#b45309;">(不含產蛋蛋雞)</span>';
-              } else if (sp.restrictions && sp.restrictions.includes('not-laying-ducks')) {
-                restr = ' <span style="color:#b45309;">(不含產蛋蛋鴨)</span>';
-              }
-              return `<span style="font-size:0.75rem; background:#f9fafb; border:1px solid #e5e7eb; padding:0.1rem 0.35rem; border-radius:4px; margin-right:0.25rem;">${name}${restr}</span>`;
-            })
-            .slice(0, 6)
-            .join('');
-
-          let otherIngHtml = '';
-          if (!p.isSingleIngredient && currentIngredient) {
-            const others = p.ingredients.filter((i) => i.slug !== currentIngredient?.slug);
-            if (others.length > 0) {
-              const otherLinks = others
-                .map((i) => {
-                  return `<a href="${ingredientUrl(i.slug)}" style="font-size:0.8rem; margin-right:0.25rem;">+${escapeHtml(i.name)}</a>`;
-                })
-                .join('');
-              otherIngHtml = `<div style="font-size:0.8rem; color:#6b7280; border-top:1px dashed #e5e7eb; padding-top:0.3rem;">複方包含：${otherLinks}</div>`;
-            }
-          }
-
-          card.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;">
-              <div>
-                <div style="display:flex; align-items:center; gap:0.3rem; margin-bottom:0.2rem;">
-                  ${statusTag}
-                  <span style="font-size:0.75rem; color:#6b7280;">${escapeHtml(p.licenseNo)}</span>
-                </div>
-                <a href="${drugUrl(p.slug)}" style="font-weight:700; color:#111827; font-size:1.05rem;">${escapeHtml(p.nameZh)}</a>
-                ${p.nameEn ? `<div style="font-size:0.8rem; color:#6b7280;">${escapeHtml(p.nameEn)}</div>` : ''}
-              </div>
-              <label style="display:flex; align-items:center; gap:0.25rem; font-size:0.75rem; cursor:pointer; background:#f9fafb; padding:0.25rem 0.4rem; border-radius:4px; border:1px solid #e5e7eb; white-space:nowrap;">
-                <input type="checkbox" class="compare-chk" data-slug="${escapeHtml(p.slug)}" ${isCompared ? 'checked' : ''} />
-                <span>比較</span>
-              </label>
-            </div>
-
-            <div style="font-size:0.8rem; color:#4b5563;">
-              <div>業者：${escapeHtml(p.vendorName || '未載明')}</div>
-              <div>效期：${escapeHtml(p.expiryDate || '未載明')}</div>
-            </div>
-
-            ${otherIngHtml}
-
-            ${speciesTags ? `<div style="border-top:1px dashed #e5e7eb; padding-top:0.3rem;">${speciesTags}</div>` : ''}
-          `;
+          card.innerHTML = renderProductCard(p, {
+            mode: 'ingredient',
+            currentIngredientSlug: currentSlug,
+            isCompared,
+          });
 
           const chk = card.querySelector('.compare-chk');
           if (chk) {

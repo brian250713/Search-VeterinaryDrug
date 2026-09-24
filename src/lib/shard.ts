@@ -1,5 +1,6 @@
 export const DRUG_SHARDS = 128;
 export const INGREDIENT_SHARDS = 64;
+export const COMPANY_SHARDS = 64;
 
 /**
  * 32-bit FNV-1a hash algorithm

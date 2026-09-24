@@ -2,7 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Product, Ingredient } from '../src/types/drug.js';
-import { shardOf, shardPath, DRUG_SHARDS, INGREDIENT_SHARDS } from '../src/lib/shard.js';
+import { shardOf, shardPath, DRUG_SHARDS, INGREDIENT_SHARDS, COMPANY_SHARDS } from '../src/lib/shard.js';
+import { normalizeCompanyName } from '../src/lib/company.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -62,6 +63,16 @@ function main() {
   }
   console.log(`[verify] ✓ 成分分片數量正確 (${INGREDIENT_SHARDS} 片)`);
 
+  const companyDir = path.join(targetRoot, 'data', 'company');
+  if (!fs.existsSync(companyDir)) {
+    throw new Error(`驗證失敗: 找不到公司分片目錄 ${companyDir}`);
+  }
+  const companyShardFiles = fs.readdirSync(companyDir).filter((f) => f.endsWith('.json'));
+  if (companyShardFiles.length !== COMPANY_SHARDS) {
+    throw new Error(`驗證失敗: 公司分片數量應為 ${COMPANY_SHARDS}，實際為 ${companyShardFiles.length}`);
+  }
+  console.log(`[verify] ✓ 公司分片數量正確 (${COMPANY_SHARDS} 片)`);
+
   // 3. 抽樣產品與成分 slug，驗證能在 shardOf 算出的分片中找到
   console.log('[verify] 3. 抽樣比對產品與成分分片雜湊對應...');
   const products: Product[] = JSON.parse(fs.readFileSync(productsPath, 'utf8'));
@@ -96,12 +107,36 @@ function main() {
   }
   console.log(`[verify] ✓ 抽樣 ${sampleIngredients.length} 筆成分皆可在對應分片正確找到`);
 
+  // 抽樣業者與製造廠名稱，驗證能在算出的公司分片中找到
+  const sampleVendorRaw = products.find((p) => (p.vendorName || '').trim())?.vendorName || '';
+  const sampleFactoryRaw = products.find((p) => (p.factoryName || '').trim())?.factoryName || '';
+  const sampleCompanies = [
+    normalizeCompanyName(sampleVendorRaw),
+    normalizeCompanyName(sampleFactoryRaw),
+  ].filter(Boolean);
+  if (sampleCompanies.length === 0) {
+    throw new Error('驗證失敗: products.json 中找不到可抽樣的業者或製造廠名稱');
+  }
+  for (const name of sampleCompanies) {
+    const shardIdx = shardOf(name, COMPANY_SHARDS);
+    const shardFile = path.join(targetRoot, shardPath('company', shardIdx));
+    if (!fs.existsSync(shardFile)) {
+      throw new Error(`驗證失敗: 公司分片檔案不存在: ${shardFile}`);
+    }
+    const shardContent = JSON.parse(fs.readFileSync(shardFile, 'utf8'));
+    if (!shardContent[name]) {
+      throw new Error(`驗證失敗: 公司 ${name} 無法在分片 ${shardIdx} (${shardFile}) 中找到`);
+    }
+  }
+  console.log(`[verify] ✓ 抽樣業者與製造廠名稱皆可在對應公司分片正確找到 (${sampleCompanies.join('、')})`);
+
   // 4. 若 distDir 存在，驗證 HTML 產出結構
   if (fs.existsSync(distDir)) {
     console.log('[verify] 4. 驗證 dist 產出結構...');
 
     const distDrugIndex = path.join(distDir, 'drug', 'index.html');
     const distIngredientIndex = path.join(distDir, 'ingredient', 'index.html');
+    const distCompanyIndex = path.join(distDir, 'company', 'index.html');
 
     if (!fs.existsSync(distDrugIndex)) {
       throw new Error(`驗證失敗: 找不到 ${distDrugIndex}`);
@@ -109,7 +144,10 @@ function main() {
     if (!fs.existsSync(distIngredientIndex)) {
       throw new Error(`驗證失敗: 找不到 ${distIngredientIndex}`);
     }
-    console.log('[verify] ✓ dist/drug/index.html 與 dist/ingredient/index.html 均存在');
+    if (!fs.existsSync(distCompanyIndex)) {
+      throw new Error(`驗證失敗: 找不到 ${distCompanyIndex}`);
+    }
+    console.log('[verify] ✓ dist/drug/index.html、dist/ingredient/index.html 與 dist/company/index.html 均存在');
 
     // 檢查 dist/drug/ 與 dist/ingredient/ 底下沒有子目錄
     const distDrugEntries = fs.readdirSync(path.join(distDir, 'drug'), { withFileTypes: true });
@@ -124,6 +162,13 @@ function main() {
       throw new Error(`驗證失敗: dist/ingredient/ 底下不應有子目錄，但發現: ${ingSubDirs.map((d) => d.name).join(', ')}`);
     }
     console.log('[verify] ✓ dist/drug/ 與 dist/ingredient/ 底下均無子目錄 (單一殼頁模式生效)');
+
+    const distCompanyEntries = fs.readdirSync(path.join(distDir, 'company'), { withFileTypes: true });
+    const companySubDirs = distCompanyEntries.filter((e) => e.isDirectory());
+    if (companySubDirs.length > 0) {
+      throw new Error(`驗證失敗: dist/company/ 底下不應有子目錄，但發現: ${companySubDirs.map((d) => d.name).join(', ')}`);
+    }
+    console.log('[verify] ✓ dist/company/ 底下無子目錄 (單一殼頁模式生效)');
 
     // 檢查 dist/data/compare-data.json 不存在
     const legacyCompareDataDist = path.join(distDir, 'data', 'compare-data.json');

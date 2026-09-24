@@ -5,6 +5,9 @@ import type {
   Product,
   Ingredient,
   ProductSummary,
+  CompanyProductSummary,
+  CompanyDetailShard,
+  CompanyRole,
   ProductShard,
   IngredientDetailShard,
 } from '../src/types/drug.js';
@@ -13,7 +16,9 @@ import {
   shardPath,
   DRUG_SHARDS,
   INGREDIENT_SHARDS,
+  COMPANY_SHARDS,
 } from '../src/lib/shard.js';
+import { normalizeCompanyName } from '../src/lib/company.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,6 +29,7 @@ const ingredientsPath = path.join(projectRoot, 'data', 'ingredients.json');
 const publicDataDir = path.join(projectRoot, 'public', 'data');
 const drugShardsDir = path.join(publicDataDir, 'drug');
 const ingredientShardsDir = path.join(publicDataDir, 'ingredient');
+const companyShardsDir = path.join(publicDataDir, 'company');
 
 function cleanAndEnsureDir(dir: string) {
   if (fs.existsSync(dir)) {
@@ -48,6 +54,36 @@ export function buildShards() {
 
   cleanAndEnsureDir(drugShardsDir);
   cleanAndEnsureDir(ingredientShardsDir);
+  cleanAndEnsureDir(companyShardsDir);
+
+  function toSummary(prod: Product): ProductSummary {
+    return {
+      slug: prod.slug,
+      licenseNo: prod.licenseNo,
+      nameZh: prod.nameZh,
+      nameEn: prod.nameEn,
+      origin: prod.origin,
+      category: prod.category,
+      status: prod.status,
+      expiryDate: prod.expiryDate,
+      dosageFormCategory: prod.dosageForm.category,
+      isSingleIngredient: prod.isSingleIngredient,
+      ingredients: prod.ingredients.map((ing) => ({
+        name: ing.name,
+        slug: ing.slug,
+        chineseName: ing.chineseName,
+      })),
+      speciesIndications: prod.speciesIndications.map((sp) => ({
+        species: sp.species,
+        label: sp.label,
+        restrictions: sp.restrictions,
+        generic: sp.generic,
+      })),
+      vendorName: prod.vendorName,
+      factoryName: prod.factoryName,
+      exportOnly: prod.exportOnly,
+    };
+  }
 
   // 1. 產生產品分片 (DRUG_SHARDS = 128)
   const drugShards: ProductShard[] = Array.from({ length: DRUG_SHARDS }, () => ({}));
@@ -83,31 +119,7 @@ export function buildShards() {
   for (const prod of products) {
     if (prod.category !== 'general') continue;
 
-    const summary: ProductSummary = {
-      slug: prod.slug,
-      licenseNo: prod.licenseNo,
-      nameZh: prod.nameZh,
-      nameEn: prod.nameEn,
-      origin: prod.origin,
-      category: prod.category,
-      status: prod.status,
-      expiryDate: prod.expiryDate,
-      dosageFormCategory: prod.dosageForm.category,
-      isSingleIngredient: prod.isSingleIngredient,
-      ingredients: prod.ingredients.map((ing) => ({
-        name: ing.name,
-        slug: ing.slug,
-        chineseName: ing.chineseName,
-      })),
-      speciesIndications: prod.speciesIndications.map((sp) => ({
-        species: sp.species,
-        label: sp.label,
-        restrictions: sp.restrictions,
-        generic: sp.generic,
-      })),
-      vendorName: prod.vendorName,
-      exportOnly: prod.exportOnly,
-    };
+    const summary: ProductSummary = toSummary(prod);
 
     const seenSlugsInProd = new Set<string>();
     for (const ing of prod.ingredients) {
@@ -139,6 +151,90 @@ export function buildShards() {
     totalIngredientShardBytes += Buffer.byteLength(content, 'utf8');
   }
 
+  // 3. 產生公司分片 (COMPANY_SHARDS = 64)：收錄所有類別
+  // key 為正規化後的公司名稱；同一家公司在同一產品下只列一次並記錄 roles
+  interface CompanyAcc {
+    name: string;
+    addressCounts: Map<string, number>;
+    products: Map<string, CompanyProductSummary>;
+    vendorCount: number;
+    factoryCount: number;
+  }
+
+  const companyMap = new Map<string, CompanyAcc>();
+
+  function getCompanyAcc(name: string): CompanyAcc {
+    let acc = companyMap.get(name);
+    if (!acc) {
+      acc = { name, addressCounts: new Map(), products: new Map(), vendorCount: 0, factoryCount: 0 };
+      companyMap.set(name, acc);
+    }
+    return acc;
+  }
+
+  function addCompanyProduct(acc: CompanyAcc, prod: Product, role: CompanyRole, address: string) {
+    const trimmedAddr = (address || '').trim();
+    if (trimmedAddr) {
+      acc.addressCounts.set(trimmedAddr, (acc.addressCounts.get(trimmedAddr) || 0) + 1);
+    }
+    if (role === 'vendor') acc.vendorCount++;
+    else acc.factoryCount++;
+
+    let summary = acc.products.get(prod.slug);
+    if (!summary) {
+      summary = { ...toSummary(prod), roles: [] };
+      acc.products.set(prod.slug, summary);
+    }
+    if (!summary.roles.includes(role)) {
+      summary.roles.push(role);
+    }
+  }
+
+  for (const prod of products) {
+    const vendorKey = normalizeCompanyName(prod.vendorName);
+    const factoryKey = normalizeCompanyName(prod.factoryName);
+
+    // 空白名稱不建立公司
+    if (vendorKey) {
+      addCompanyProduct(getCompanyAcc(vendorKey), prod, 'vendor', prod.vendorAddress);
+    }
+    if (factoryKey) {
+      addCompanyProduct(getCompanyAcc(factoryKey), prod, 'factory', prod.factoryAddress);
+    }
+  }
+
+  const companyShards: CompanyDetailShard[] = Array.from(
+    { length: COMPANY_SHARDS },
+    () => ({})
+  );
+
+  for (const acc of companyMap.values()) {
+    const addresses = [...acc.addressCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([addr]) => addr);
+    const shardIdx = shardOf(acc.name, COMPANY_SHARDS);
+    companyShards[shardIdx][acc.name] = {
+      company: {
+        name: acc.name,
+        addresses,
+        vendorCount: acc.vendorCount,
+        factoryCount: acc.factoryCount,
+      },
+      products: [...acc.products.values()],
+    };
+  }
+
+  let totalCompanyShardBytes = 0;
+  let maxCompanyShardBytes = 0;
+  for (let i = 0; i < COMPANY_SHARDS; i++) {
+    const filePath = path.join(projectRoot, 'public', shardPath('company', i));
+    const content = JSON.stringify(companyShards[i]);
+    fs.writeFileSync(filePath, content, 'utf8');
+    const size = Buffer.byteLength(content, 'utf8');
+    totalCompanyShardBytes += size;
+    if (size > maxCompanyShardBytes) maxCompanyShardBytes = size;
+  }
+
   const logPath = path.join(projectRoot, 'data', 'build-log.json');
   if (fs.existsSync(logPath)) {
     try {
@@ -146,10 +242,15 @@ export function buildShards() {
       logData.shards = {
         drugShards: DRUG_SHARDS,
         ingredientShards: INGREDIENT_SHARDS,
+        companyShards: COMPANY_SHARDS,
+        companyCount: companyMap.size,
         totalDrugBytes: totalDrugShardBytes,
         totalIngredientBytes: totalIngredientShardBytes,
+        totalCompanyBytes: totalCompanyShardBytes,
         avgDrugBytes: Math.round(totalDrugShardBytes / DRUG_SHARDS),
         avgIngredientBytes: Math.round(totalIngredientShardBytes / INGREDIENT_SHARDS),
+        avgCompanyBytes: Math.round(totalCompanyShardBytes / COMPANY_SHARDS),
+        maxCompanyBytes: maxCompanyShardBytes,
       };
       fs.writeFileSync(logPath, JSON.stringify(logData, null, 2), 'utf8');
     } catch {
@@ -163,6 +264,9 @@ export function buildShards() {
   );
   console.log(
     `  - 成分分片: ${INGREDIENT_SHARDS} 片，總大小 ${(totalIngredientShardBytes / 1024 / 1024).toFixed(2)} MB (平均每片 ${(totalIngredientShardBytes / INGREDIENT_SHARDS / 1024).toFixed(1)} KB)`
+  );
+  console.log(
+    `  - 公司分片: ${COMPANY_SHARDS} 片，公司數 ${companyMap.size}，總大小 ${(totalCompanyShardBytes / 1024 / 1024).toFixed(2)} MB (平均每片 ${(totalCompanyShardBytes / COMPANY_SHARDS / 1024).toFixed(1)} KB，最大單片 ${(maxCompanyShardBytes / 1024).toFixed(1)} KB)`
   );
 }
 

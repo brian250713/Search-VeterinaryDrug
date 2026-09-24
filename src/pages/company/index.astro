@@ -1,0 +1,508 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import metaData from '../../../data/meta.json';
+import { withBase } from '../../lib/url';
+
+const dataVersion = metaData.fetchedAt;
+---
+
+<Layout
+  title="公司產品瀏覽 - 動物用藥資訊"
+  description="依申請業者與製造廠查詢動物用藥產品，包含角色、類別、物種與劑型篩選。"
+>
+  <div id="company-app" data-version={dataVersion} style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <!-- 1. 骨架畫面 / 載入中狀態 (預設顯示) -->
+    <div id="state-loading" style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div class="card skeleton-card" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
+        <div class="skeleton-line" style="width: 140px; height: 24px;"></div>
+        <div class="skeleton-line" style="width: 50%; height: 32px;"></div>
+        <div class="skeleton-line" style="width: 30%; height: 20px;"></div>
+      </div>
+
+      <div class="card skeleton-card" style="padding: 1rem; display: flex; gap: 1rem;">
+        <div class="skeleton-line" style="width: 150px; height: 32px;"></div>
+        <div class="skeleton-line" style="width: 150px; height: 32px;"></div>
+        <div class="skeleton-line" style="width: 150px; height: 32px;"></div>
+      </div>
+
+      <noscript>
+        <div class="card" style="background-color: #fef2f2; border: 1px solid #f87171; padding: 1.5rem; text-align: center; color: #991b1b;">
+          <p style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;">本頁面需要啟用 JavaScript</p>
+          <p style="font-size: 0.9rem;">公司產品列表採用即時分片讀取，請在瀏覽器設定中開啟 JavaScript 後重新整理頁面。</p>
+        </div>
+      </noscript>
+    </div>
+
+    <!-- 2. 查無資料狀態 (Not Found) -->
+    <div id="state-not-found" class="card" style="display: none; padding: 2.5rem; text-align: center; color: #4b5563;">
+      <span style="font-size: 2.5rem; display: block; margin-bottom: 0.5rem;">🔍</span>
+      <h2 style="font-size: 1.35rem; color: #111827; margin-bottom: 0.5rem;">找不到此公司</h2>
+      <p style="font-size: 0.95rem; margin-bottom: 1.5rem;">
+        您所查詢的公司名稱不存在或網址參數有誤。請回到首頁以公司名稱搜尋看看。
+      </p>
+      <a href={withBase('/')} class="btn btn-primary" style="display: inline-block; padding: 0.5rem 1.25rem;">
+        回到首頁搜尋
+      </a>
+    </div>
+
+    <!-- 3. 載入失敗狀態 (Error) -->
+    <div id="state-error" class="card" style="display: none; padding: 2.5rem; text-align: center; color: #991b1b; background-color: #fef2f2; border: 1px solid #fecaca;">
+      <span style="font-size: 2.5rem; display: block; margin-bottom: 0.5rem;">⚠️</span>
+      <h2 style="font-size: 1.35rem; color: #991b1b; margin-bottom: 0.5rem;">資料載入失敗</h2>
+      <p style="font-size: 0.95rem; color: #7f1d1d; margin-bottom: 1.5rem;">
+        網路連線中斷或伺服器異常，無法讀取公司資料分片。
+      </p>
+      <div style="display: flex; justify-content: center; gap: 1rem;">
+        <button id="retry-btn" class="btn btn-primary" style="padding: 0.5rem 1.25rem;">
+          🔄 重新載入
+        </button>
+        <a href={withBase('/')} class="btn btn-secondary" style="padding: 0.5rem 1.25rem;">
+          回到首頁搜尋
+        </a>
+      </div>
+    </div>
+
+    <!-- 4. 渲染完成容器 (Ready) -->
+    <div id="state-ready" style="display: none; flex-direction: column; gap: 1.5rem;">
+      <!-- 標題與統計卡片 -->
+      <div class="card" id="co-header-card" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+
+      <!-- 篩選列 -->
+      <div class="card" style="padding: 1rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label style="font-size: 0.85rem; font-weight: 600; color: #374151;">角色篩選：</label>
+          <select id="co-filter-role" class="input-text" style="width: auto; padding: 0.35rem 0.6rem; font-size: 0.85rem;">
+            <option value="all">全部</option>
+            <option value="vendor">申請業者</option>
+            <option value="factory">製造廠</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label style="font-size: 0.85rem; font-weight: 600; color: #374151;">物種篩選：</label>
+          <select id="co-filter-species" class="input-text" style="width: auto; padding: 0.35rem 0.6rem; font-size: 0.85rem;">
+            <option value="">全部物種</option>
+            <option value="pig">豬</option>
+            <option value="chicken">雞（含肉雞）</option>
+            <option value="laying-hen">🥚 蛋雞（排他限制）</option>
+            <option value="duck">鴨（含肉鴨）</option>
+            <option value="laying-duck">🥚 蛋鴨（排他限制）</option>
+            <option value="cattle">牛</option>
+            <option value="sheep">羊</option>
+            <option value="horse">馬</option>
+            <option value="dog">犬</option>
+            <option value="cat">貓</option>
+            <option value="aquatic">水產動物</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label style="font-size: 0.85rem; font-weight: 600; color: #374151;">劑型篩選：</label>
+          <select id="co-filter-dosage" class="input-text" style="width: auto; padding: 0.35rem 0.6rem; font-size: 0.85rem;">
+            <option value="">全部劑型</option>
+            <option value="注射劑">注射劑</option>
+            <option value="散劑">散劑</option>
+            <option value="口服液劑">口服液劑</option>
+            <option value="外用液劑">外用液劑</option>
+            <option value="錠劑">錠劑</option>
+            <option value="膠囊劑">膠囊劑</option>
+            <option value="軟膏劑">軟膏劑</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label style="font-size: 0.85rem; font-weight: 600; color: #374151;">產地：</label>
+          <select id="co-filter-origin" class="input-text" style="width: auto; padding: 0.35rem 0.6rem; font-size: 0.85rem;">
+            <option value="all">全部產地</option>
+            <option value="國產">國產</option>
+            <option value="輸入">輸入</option>
+          </select>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-left: auto;">
+          <label style="font-size: 0.85rem; display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+            <input type="checkbox" id="co-filter-biologic" />
+            <span>包含生物製劑</span>
+          </label>
+          <label style="font-size: 0.85rem; display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+            <input type="checkbox" id="co-filter-raw" />
+            <span>包含原料藥</span>
+          </label>
+          <label style="font-size: 0.85rem; display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+            <input type="checkbox" id="co-filter-expired" />
+            <span>包含已失效</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 預設隱藏提示 -->
+      <div id="co-hidden-hint" style="display: none; background-color: #f3f4f6; padding: 0.6rem 1rem; border-radius: 6px; font-size: 0.85rem; color: #4b5563;">
+      </div>
+
+      <!-- 蛋雞／蛋鴨排除提醒 -->
+      <div id="co-laying-alert" style="display: none; background-color: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; padding: 0.75rem 1rem; border-radius: 6px; font-size: 0.85rem; color: #92400e;">
+        <span>⚠️ 另有 <strong id="co-laying-count">0</strong> 項產品因標記「不含產蛋中之蛋雞／蛋鴨」而被排除。</span>
+        <button id="co-toggle-laying-btn" style="background: none; border: none; color: #b45309; text-decoration: underline; cursor: pointer; font-weight: 600; margin-left: 0.5rem;">
+          展開這些產品
+        </button>
+      </div>
+
+      <!-- 產品列表本體 (依單方/複方分組) -->
+      <div id="co-groups-container" style="display: flex; flex-direction: column; gap: 2rem;">
+        <!-- 單方藥品群組 -->
+        <section class="co-section" id="co-section-single">
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; border-bottom: 2px solid #059669; padding-bottom: 0.4rem;">
+            <h2 style="font-size: 1.3rem; color: #065f46; margin: 0;">一、單方藥品</h2>
+            <span style="font-size: 0.9rem; color: #6b7280;">（僅含單一成分）</span>
+          </div>
+          <div class="product-cards-container" id="co-container-single" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+        </section>
+
+        <!-- 複方藥品群組 -->
+        <section class="co-section" id="co-section-compound">
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; border-bottom: 2px solid #d97706; padding-bottom: 0.4rem;">
+            <h2 style="font-size: 1.3rem; color: #92400e; margin: 0;">二、複方藥品</h2>
+            <span style="font-size: 0.9rem; color: #6b7280;">（含多種合併成分）</span>
+          </div>
+          <div style="background-color: #fffbeb; border: 1px solid #fef3c7; padding: 0.6rem 0.85rem; border-radius: 6px; font-size: 0.85rem; color: #92400e; margin-bottom: 0.75rem;">
+            ⚠️ <strong>不可直接替代說明：</strong> 複方藥品含有多種協同或複方主成分，藥物動力學與適應症可能不同，不能直接視為單方產品或其他複方之等效替代品。
+          </div>
+          <div class="product-cards-container" id="co-container-compound" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .skeleton-line {
+      background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);
+      background-size: 400% 100%;
+      animation: skeleton-loading 1.4s ease infinite;
+      border-radius: 4px;
+    }
+    @keyframes skeleton-loading {
+      0% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0 50%;
+      }
+    }
+  </style>
+
+  <script>
+    import { shardOf, shardPath, COMPANY_SHARDS } from '../../lib/shard';
+    import { dataUrl } from '../../lib/url';
+    import { escapeHtml } from '../../lib/escape-html';
+    import { normalizeCompanyName } from '../../lib/company';
+    import {
+      filterProducts,
+      groupProducts,
+      renderProductCard,
+      type DosageGroup,
+    } from '../../lib/product-list';
+    import type { CompanyInfo, CompanyProductSummary } from '../../types/drug';
+
+    const appEl = document.getElementById('company-app');
+    const dataVersion = appEl?.getAttribute('data-version') || undefined;
+
+    const stateLoading = document.getElementById('state-loading');
+    const stateNotFound = document.getElementById('state-not-found');
+    const stateError = document.getElementById('state-error');
+    const stateReady = document.getElementById('state-ready');
+    const retryBtn = document.getElementById('retry-btn');
+
+    let currentCompany: CompanyInfo | null = null;
+    let currentCompanyName = '';
+    let initialProducts: CompanyProductSummary[] = [];
+    let expandLaying = false;
+
+    function showState(state: 'loading' | 'notFound' | 'error' | 'ready') {
+      if (stateLoading) stateLoading.style.display = state === 'loading' ? 'flex' : 'none';
+      if (stateNotFound) stateNotFound.style.display = state === 'notFound' ? 'block' : 'none';
+      if (stateError) stateError.style.display = state === 'error' ? 'block' : 'none';
+      if (stateReady) stateReady.style.display = state === 'ready' ? 'flex' : 'none';
+    }
+
+    function getCompareList(): string[] {
+      try {
+        const raw = localStorage.getItem('vet_drug_compare_list');
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function toggleCompare(slug: string, isChecked: boolean) {
+      try {
+        let list = getCompareList();
+        if (!Array.isArray(list)) list = [];
+        if (isChecked) {
+          if (list.length >= 3) {
+            alert('比較清單上限為 3 項產品');
+            const cb = document.querySelector(`.compare-chk[data-slug="${slug}"]`) as HTMLInputElement | null;
+            if (cb) cb.checked = false;
+            return;
+          }
+          if (!list.includes(slug)) list.push(slug);
+        } else {
+          list = list.filter((s) => s !== slug);
+        }
+        localStorage.setItem('vet_drug_compare_list', JSON.stringify(list));
+        window.dispatchEvent(new Event('compare-updated'));
+      } catch {}
+    }
+
+    function renderHeader(company: CompanyInfo) {
+      const headerCard = document.getElementById('co-header-card');
+      if (!headerCard) return;
+
+      const addresses = company.addresses || [];
+      const mainAddress = addresses.length > 0 ? addresses[0] : '未載明';
+      let addressHtml = `<div style="font-size: 0.9rem; color: #4b5563;">📍 ${escapeHtml(mainAddress)}</div>`;
+      if (addresses.length > 1) {
+        const restItems = addresses
+          .slice(1)
+          .map((a) => `<li>${escapeHtml(a)}</li>`)
+          .join('');
+        addressHtml += `
+          <details style="font-size: 0.85rem; color: #4b5563;">
+            <summary style="cursor: pointer; color: #047857;">還有 ${addresses.length - 1} 個登記地址（展開）</summary>
+            <ul style="margin: 0.4rem 0 0 1.25rem; padding: 0;">${restItems}</ul>
+          </details>
+        `;
+      }
+
+      headerCard.innerHTML = `
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+              <span class="badge" style="background-color: #e0e7ff; color: #3730a3;">公司</span>
+            </div>
+            <h1 style="font-size: 1.75rem; color: #111827; margin: 0 0 0.4rem 0;">
+              ${escapeHtml(company.name)}
+            </h1>
+            ${addressHtml}
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; font-size: 0.9rem;">
+            <div style="background-color: #f9fafb; border: 1px solid var(--border); padding: 0.5rem 0.75rem; border-radius: 6px; text-align: center;">
+              <div style="color: #6b7280; font-size: 0.75rem;">申請業者</div>
+              <strong style="font-size: 1.1rem; color: #047857;">${company.vendorCount} 項</strong>
+            </div>
+            <div style="background-color: #f9fafb; border: 1px solid var(--border); padding: 0.5rem 0.75rem; border-radius: 6px; text-align: center;">
+              <div style="color: #6b7280; font-size: 0.75rem;">製造廠</div>
+              <strong style="font-size: 1.1rem; color: #166534;">${company.factoryCount} 項</strong>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderGroupedProducts() {
+      const role = (document.getElementById('co-filter-role') as HTMLSelectElement)?.value || 'all';
+      const sp = (document.getElementById('co-filter-species') as HTMLSelectElement)?.value || '';
+      const dosage = (document.getElementById('co-filter-dosage') as HTMLSelectElement)?.value || '';
+      const origin = (document.getElementById('co-filter-origin') as HTMLSelectElement)?.value || 'all';
+      const incBiologic = (document.getElementById('co-filter-biologic') as HTMLInputElement)?.checked || false;
+      const incRaw = (document.getElementById('co-filter-raw') as HTMLInputElement)?.checked || false;
+      const incExpired = (document.getElementById('co-filter-expired') as HTMLInputElement)?.checked || false;
+
+      const {
+        items: filtered,
+        excludedLayingCount: layingExcluded,
+        hiddenBiologicCount,
+        hiddenRawMaterialCount,
+        hiddenExpiredCount,
+      } = filterProducts(initialProducts, {
+        role: role as 'all' | 'vendor' | 'factory',
+        species: sp,
+        dosageCategory: dosage,
+        origin: origin as 'all' | '國產' | '輸入',
+        includeExpired: incExpired,
+        includeBiologic: incBiologic,
+        includeRawMaterial: incRaw,
+        expandLaying,
+      });
+
+      const hiddenHint = document.getElementById('co-hidden-hint');
+      if (hiddenHint) {
+        const parts: string[] = [];
+        if (hiddenBiologicCount > 0 && !incBiologic) {
+          parts.push(`生物製劑 ${hiddenBiologicCount} 項（可勾選「包含生物製劑」顯示）`);
+        }
+        if (hiddenRawMaterialCount > 0 && !incRaw) {
+          parts.push(`原料藥 ${hiddenRawMaterialCount} 項（可勾選「包含原料藥」顯示）`);
+        }
+        if (hiddenExpiredCount > 0 && !incExpired) {
+          parts.push(`已失效 ${hiddenExpiredCount} 項（可勾選「包含已失效」顯示）`);
+        }
+        if (parts.length > 0) {
+          hiddenHint.style.display = 'block';
+          hiddenHint.textContent = `預設隱藏：${parts.join('、')}。`;
+        } else {
+          hiddenHint.style.display = 'none';
+        }
+      }
+
+      const layingAlert = document.getElementById('co-laying-alert');
+      const layingCount = document.getElementById('co-laying-count');
+      if (layingAlert && layingCount) {
+        if (layingExcluded > 0 && !expandLaying) {
+          layingAlert.style.display = 'block';
+          layingCount.textContent = String(layingExcluded);
+        } else {
+          layingAlert.style.display = 'none';
+        }
+      }
+
+      const grouped = groupProducts(filtered);
+
+      renderSubgroup('co-container-single', grouped.single);
+      renderSubgroup('co-container-compound', grouped.compound);
+
+      const singleCount = grouped.single.reduce((n, g) => n + g.products.length, 0);
+      const compoundCount = grouped.compound.reduce((n, g) => n + g.products.length, 0);
+      const secSingle = document.getElementById('co-section-single');
+      const secCompound = document.getElementById('co-section-compound');
+      if (secSingle) secSingle.style.display = singleCount > 0 ? 'block' : 'none';
+      if (secCompound) secCompound.style.display = compoundCount > 0 ? 'block' : 'none';
+    }
+
+    function renderSubgroup(containerId: string, groups: DosageGroup<CompanyProductSummary>[]) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = '';
+
+      const total = groups.reduce((n, g) => n + g.products.length, 0);
+      if (total === 0) {
+        container.innerHTML = '<p style="color:#6b7280; font-size:0.9rem; padding:0.5rem 0;">無符合篩選條件的產品。</p>';
+        return;
+      }
+
+      const compareList = getCompareList();
+
+      for (const { category: catName, products: prods } of groups) {
+        const groupEl = document.createElement('div');
+        groupEl.style.display = 'flex';
+        groupEl.style.flexDirection = 'column';
+        groupEl.style.gap = '0.75rem';
+
+        const headerEl = document.createElement('div');
+        headerEl.style.display = 'flex';
+        headerEl.style.alignItems = 'center';
+        headerEl.style.gap = '0.5rem';
+        headerEl.innerHTML = `<h3 style="font-size:1.05rem; color:#374151; margin:0;">${escapeHtml(catName)}</h3><span class="badge" style="background:#f3f4f6; color:#4b5563;">${prods.length} 項產品</span>`;
+        groupEl.appendChild(headerEl);
+
+        const grid = document.createElement('div');
+        grid.style.display = 'grid';
+        grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(320px, 1fr))';
+        grid.style.gap = '0.75rem';
+
+        for (const p of prods) {
+          const isCompared = compareList.includes(p.slug);
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.style.display = 'flex';
+          card.style.flexDirection = 'column';
+          card.style.gap = '0.5rem';
+
+          card.innerHTML = renderProductCard(p, {
+            mode: 'company',
+            companyName: currentCompanyName,
+            isCompared,
+          });
+
+          const chk = card.querySelector('.compare-chk');
+          if (chk) {
+            chk.addEventListener('change', (e: Event) => {
+              toggleCompare(p.slug, (e.target as HTMLInputElement).checked);
+            });
+          }
+
+          grid.appendChild(card);
+        }
+
+        groupEl.appendChild(grid);
+        container.appendChild(groupEl);
+      }
+    }
+
+    async function loadCompanyData() {
+      showState('loading');
+
+      const params = new URLSearchParams(window.location.search);
+      const rawName = params.get('name');
+      const name = normalizeCompanyName(rawName || '');
+
+      if (!name) {
+        showState('notFound');
+        return;
+      }
+
+      try {
+        const shardIndex = shardOf(name, COMPANY_SHARDS);
+        const relativePath = shardPath('company', shardIndex);
+        const fetchUrl = dataUrl(relativePath, dataVersion);
+
+        const response = await fetch(fetchUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const shardData = await response.json();
+        const entry = shardData[name];
+
+        if (!entry || !entry.company) {
+          showState('notFound');
+          return;
+        }
+
+        currentCompany = entry.company;
+        currentCompanyName = entry.company.name;
+        initialProducts = entry.products || [];
+
+        // 動態設定頁面標題
+        document.title = `${currentCompanyName} - 動物用藥資訊`;
+
+        renderHeader(currentCompany);
+        renderGroupedProducts();
+        showState('ready');
+      } catch (err) {
+        console.error('[company] 載入分片失敗:', err);
+        showState('error');
+      }
+    }
+
+    retryBtn?.addEventListener('click', () => {
+      loadCompanyData();
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadCompanyData();
+
+      ['co-filter-role', 'co-filter-species', 'co-filter-dosage', 'co-filter-origin', 'co-filter-biologic', 'co-filter-raw', 'co-filter-expired'].forEach((id) => {
+        document.getElementById(id)?.addEventListener('change', () => {
+          expandLaying = false;
+          renderGroupedProducts();
+        });
+      });
+
+      document.getElementById('co-toggle-laying-btn')?.addEventListener('click', () => {
+        expandLaying = !expandLaying;
+        renderGroupedProducts();
+      });
+
+      window.addEventListener('compare-updated', () => {
+        const list = getCompareList();
+        document.querySelectorAll('.compare-chk').forEach((chk) => {
+          const s = chk.getAttribute('data-slug');
+          if (s) {
+            (chk as HTMLInputElement).checked = list.includes(s);
+          }
+        });
+      });
+    });
+  </script>
+</Layout>

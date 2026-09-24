@@ -8,6 +8,7 @@ import {
 } from './display-helpers.js';
 import { escapeHtml } from './escape-html.js';
 import { ingredientUrl } from './url.js';
+import { renderCompanyLink } from './product-list.js';
 
 export function renderProduct(product: Product): string {
   const statusBadge = formatStatusBadge(product.status);
@@ -202,14 +203,14 @@ export function renderProduct(product: Product): string {
               <tr>
                 <th>申請業者</th>
                 <td>
-                  <div><strong>${escapeHtml(formatField(product.vendorName))}</strong></div>
+                  <div><strong>${renderCompanyLink(product.vendorName)}</strong></div>
                   <div style="color: #6b7280; font-size: 0.85rem;">${escapeHtml(formatField(product.vendorAddress))}</div>
                 </td>
               </tr>
               <tr>
                 <th>製造廠</th>
                 <td>
-                  <div><strong>${escapeHtml(formatField(product.factoryName))}</strong></div>
+                  <div><strong>${renderCompanyLink(product.factoryName)}</strong></div>
                   <div style="color: #6b7280; font-size: 0.85rem;">${escapeHtml(formatField(product.factoryAddress))}</div>
                 </td>
               </tr>

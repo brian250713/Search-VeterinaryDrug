@@ -19,7 +19,7 @@ export interface FilterResult<T> {
   excludedLayingCount: number;
 }
 
-const AQUATIC_SPECIES = new Set([
+export const AQUATIC_SPECIES = new Set([
   'eel-order',
   'perciformes',
   'cypriniformes',

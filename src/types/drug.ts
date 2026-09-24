@@ -134,7 +134,28 @@ export interface ProductSummary {
   ingredients: ProductSummaryIngredient[];
   speciesIndications: ProductSummarySpeciesIndication[];
   vendorName: string;
+  factoryName: string;
   exportOnly: boolean;
+}
+
+export type CompanyRole = 'vendor' | 'factory';
+
+export interface CompanyProductSummary extends ProductSummary {
+  roles: CompanyRole[];
+}
+
+export interface CompanyInfo {
+  name: string;
+  addresses: string[];
+  vendorCount: number;
+  factoryCount: number;
+}
+
+export interface CompanyDetailShard {
+  [name: string]: {
+    company: CompanyInfo;
+    products: CompanyProductSummary[];
+  };
 }
 
 export interface IngredientDetailShard {

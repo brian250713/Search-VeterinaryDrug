@@ -114,6 +114,7 @@ const dataVersion = metaData.fetchedAt;
   <script>
     import { shardOf, shardPath, DRUG_SHARDS } from '../lib/shard';
     import { dataUrl, drugUrl, ingredientUrl } from '../lib/url';
+    import { renderCompanyLink } from '../lib/product-list';
     import { escapeHtml } from '../lib/escape-html';
     import type { Product } from '../types/drug';
 
@@ -293,13 +294,13 @@ const dataVersion = metaData.fetchedAt;
         },
         {
           label: '申請業者',
-          getter: (p: Product) => p.vendorName || '',
-          render: (p: Product) => escapeHtml(p.vendorName || '未載明')
+          getter: (p: Product) => (p.vendorName || '').trim(),
+          render: (p: Product) => renderCompanyLink(p.vendorName)
         },
         {
           label: '製造廠',
-          getter: (p: Product) => p.factoryName || '',
-          render: (p: Product) => escapeHtml(p.factoryName || '未載明')
+          getter: (p: Product) => (p.factoryName || '').trim(),
+          render: (p: Product) => renderCompanyLink(p.factoryName)
         },
         {
           label: '有效狀態',
