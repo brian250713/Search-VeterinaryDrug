@@ -77,11 +77,16 @@ a:hover {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  /* 避免在窄螢幕被 flex 壓縮而將「動物用藥資訊」折行 */
+  flex-shrink: 0;
+  white-space: nowrap;
   text-decoration: none !important;
 }
 
 .nav-links {
   display: flex;
+  /* 寬度不足時排列為多列，避免連結被逐字折行 */
+  flex-wrap: wrap;
   gap: 1rem;
   font-size: 0.95rem;
   align-items: center;
@@ -266,4 +271,18 @@ th {
 .compare-float-bar a {
   color: #34d399;
   font-weight: 600;
+}
+
+/* Narrow screens: header wraps so the nav gets a full row */
+@media (max-width: 480px) {
+  .header-inner {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .nav-links {
+    justify-content: flex-start;
+    /* 5 個 4 字連結 304px + 4 個 8px 間距 = 336px，可容納於 343px 內容寬度 */
+    gap: 0.5rem;
+  }
 }
