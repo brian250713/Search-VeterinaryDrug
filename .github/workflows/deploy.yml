@@ -12,6 +12,7 @@ permissions:
   contents: write
   pages: write
   id-token: write
+  actions: write
 
 concurrency:
   group: 'pages'
@@ -53,6 +54,16 @@ jobs:
       - name: 5. Verify release
         run: pnpm verify
 
+      - name: 6. Generate updated baseline
+        run: pnpm update-baseline
+
+      - name: Upload baseline artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: baseline
+          path: data/baseline.json
+          retention-days: 7
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
@@ -79,24 +90,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
+      - name: Download baseline artifact
+        uses: actions/download-artifact@v4
         with:
-          version: 10.32.1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Fetch and update baseline
-        run: |
-          pnpm run fetch
-          pnpm tsx scripts/update-baseline.ts
+          name: baseline
+          path: data/
 
       - name: Commit & push updated baseline
         run: |
